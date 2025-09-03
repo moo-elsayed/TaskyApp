@@ -39,6 +39,8 @@ dependencies:
   rename: ^3.1.0
   firebase_core: ^4.1.0
   flutter_native_splash: ^2.4.6
+  gap: ^3.0.1
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:

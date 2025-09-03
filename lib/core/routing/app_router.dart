@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tasky_app/core/routing/routes.dart';
+import 'package:tasky_app/features/onboarding/presentation/views/onboarding_view.dart';
 
 class AppRouter {
   Route generateRoute(RouteSettings settings) {
@@ -8,6 +9,8 @@ class AppRouter {
     final arguments = settings.arguments;
 
     switch (settings.name) {
+      case Routes.onboardingView:
+        return MaterialPageRoute(builder: (_) => const OnboardingView());
       default:
         return CupertinoPageRoute(
           builder: (context) => Scaffold(
