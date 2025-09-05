@@ -1,13 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theming/colors_manager.dart';
 import '../theming/styles.dart';
 
 class CustomMaterialButton extends StatelessWidget {
-  const CustomMaterialButton({super.key, this.onPressed, required this.text});
+  const CustomMaterialButton({
+    super.key,
+    required this.onPressed,
+    required this.text,
+    this.textStyle,
+    this.maxWidth = false,
+    this.isLoading = false,
+  });
 
-  final void Function()? onPressed;
+  final void Function() onPressed;
   final String text;
+  final TextStyle? textStyle;
+  final bool maxWidth;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +26,19 @@ class CustomMaterialButton extends StatelessWidget {
       color: ColorsManager.color5F33E1,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
+      minWidth: maxWidth ? double.infinity : null,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadiusGeometry.circular(10.r),
       ),
       padding: EdgeInsetsGeometry.symmetric(horizontal: 24.w, vertical: 12.h),
       onPressed: onPressed,
-      child: Text(text, style: TextStylesManager.font16WhiteRegular),
+      child: isLoading
+          ? const CupertinoActivityIndicator(color: ColorsManager.white)
+          : Text(
+              text,
+              style: textStyle ?? TextStylesManager.font16WhiteRegular,
+            ),
     );
   }
 }

@@ -9,4 +9,10 @@ class ColorsManager {
   static const color404147 = Color(0xff404147);
   static const colorAFAFAF = Color(0xffAFAFAF);
   static const color817D8D = Color(0xff817D8D);
+  static const colorBABABA = Color(0xffBABABA);
+  static const color7F7F7F = Color(0xff7F7F7F);
+  static const color6E6A7C = Color(0xff6E6A7C);
+  static const colorFF4949 = Color(0xffFF4949);
+  static const googleSignInBorderColor = Color(0xffdadce0);
+  static const googleSignInTextColor = Color(0xff3c4043);
 }
