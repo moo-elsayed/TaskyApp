@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:tasky_app/core/helpers/extentions.dart';
+import 'package:tasky_app/core/routing/routes.dart';
 import 'package:tasky_app/core/widgets/custom_material_button.dart';
+import '../../../../core/helpers/shared_preferences_manager.dart';
 import '../../../../core/theming/styles.dart';
 import '../../data/models/slider_model.dart';
 import '../widgets/onboarding_indicator.dart';
@@ -80,6 +83,9 @@ class _OnboardingViewState extends State<OnboardingView> {
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               );
+            } else {
+              context.pushReplacementNamed(Routes.loginView);
+              SharedPreferencesManager.setFirstTime(false);
             }
           },
         ),
