@@ -59,6 +59,12 @@ class TextStylesManager {
     color: ColorsManager.white,
   );
 
+  static TextStyle font20color404147Regular = GoogleFonts.lato(
+    fontSize: 20.sp,
+    fontWeight: FontWeightHelper.regular,
+    color: ColorsManager.color404147,
+  );
+
   static TextStyle font32color404147Bold = GoogleFonts.lato(
     fontSize: 32.sp,
     fontWeight: FontWeight.bold,
