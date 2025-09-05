@@ -160,6 +160,7 @@ class _LoginViewState extends State<RegisterView> {
                             context.read<AuthCubit>().signUpEmailAndPassword(
                               email: _emailController.text,
                               password: _passwordController.text,
+                              username: _usernameController.text,
                             );
                           }
                         },

@@ -21,7 +21,10 @@ class HomeAppBar extends StatelessWidget {
         builder: (builderContext) => BlocListener<LogoutCubit, LogoutState>(
           listener: (context, state) {
             if (state is LogoutSuccess) {
-              context.pushReplacementNamed(Routes.loginView);
+              context.pushNamedAndRemoveUntil(
+                Routes.loginView,
+                predicate: (_) => false,
+              );
             } else if (state is LogoutFailure) {
               showCustomToast(
                 context: context,
