@@ -5,6 +5,7 @@ import 'package:tasky_app/features/auth/presentation/views/login_view.dart';
 import 'package:tasky_app/features/auth/presentation/views/register_view.dart';
 import 'package:tasky_app/features/home/presentation/views/home_view.dart';
 import 'package:tasky_app/features/onboarding/presentation/views/onboarding_view.dart';
+import '../../animated_splash_screen.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
@@ -12,6 +13,8 @@ class AppRouter {
     final arguments = settings.arguments;
 
     switch (settings.name) {
+      case Routes.animatedSplashView:
+        return CupertinoPageRoute(builder: (_) => const AnimatedSplashScreen());
       case Routes.onboardingView:
         return CupertinoPageRoute(builder: (_) => const OnboardingView());
       case Routes.loginView:
