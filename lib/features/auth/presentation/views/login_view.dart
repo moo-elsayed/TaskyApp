@@ -53,7 +53,7 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthStates>(
       listener: (context, state) {
-        if (state is SignInSuccess) {
+        if (state is SignInSuccess || state is GoogleSignInSuccess) {
           showCustomToast(
             context: context,
             message: 'Welcome!',
@@ -66,13 +66,6 @@ class _LoginViewState extends State<LoginView> {
             message: state.errorMessage,
             contentType: ContentType.failure,
           );
-        } else if (state is GoogleSignInSuccess) {
-          showCustomToast(
-            context: context,
-            message: 'Welcome!',
-            contentType: ContentType.success,
-          );
-          _navigateToHome(context);
         } else if (state is GoogleSignInFailure) {
           showCustomToast(
             context: context,

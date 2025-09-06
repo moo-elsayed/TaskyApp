@@ -11,12 +11,14 @@ class AuthCubit extends Cubit<AuthStates> {
   Future<void> signUpEmailAndPassword({
     required String email,
     required String password,
+    required String username,
   }) async {
     emit(SignUpLoading());
     try {
       await firebaseAuthRepositoryImplementation.signUpEmailAndPassword(
         email: email,
         password: password,
+        username: username,
       );
       emit(SignUpSuccess());
     } catch (e) {

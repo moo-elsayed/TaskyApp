@@ -5,15 +5,25 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tasky_app/core/routing/app_router.dart';
 import 'package:tasky_app/features/auth/data/repos/firebase_auth_repo_imp.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_cubit.dart';
-import 'package:tasky_app/features/onboarding/presentation/views/onboarding_view.dart';
-import 'features/auth/presentation/views/login_view.dart';
-import 'features/home/presentation/views/home_view.dart';
+import 'core/routing/routes.dart';
 
 class TaskyApp extends StatelessWidget {
   const TaskyApp({super.key, required this.appRouter, required this.firstTime});
 
   final AppRouter appRouter;
   final bool firstTime;
+
+  String _getInitialRoute() {
+    if (firstTime) {
+      return Routes.onboardingView;
+    }
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null && user.emailVerified) {
+      return Routes.homeView;
+    } else {
+      return Routes.loginView;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,22 +35,10 @@ class TaskyApp extends StatelessWidget {
         create: (context) => AuthCubit(FirebaseAuthRepositoryImplementation()),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: _getInitialScreen(firstTime),
+          initialRoute: _getInitialRoute(),
           onGenerateRoute: appRouter.generateRoute,
         ),
       ),
     );
-  }
-
-  Widget _getInitialScreen(bool firstTime) {
-    if (firstTime) {
-      return const OnboardingView();
-    }
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null && user.emailVerified) {
-      return const HomeView();
-    } else {
-      return const LoginView();
-    }
   }
 }
