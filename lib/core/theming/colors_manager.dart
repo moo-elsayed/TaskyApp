@@ -16,4 +16,7 @@ class ColorsManager {
   static const googleSignInBorderColor = Color(0xffdadce0);
   static const googleSignInTextColor = Color(0xff3c4043);
   static const color24252C = Color(0xff24252C);
+  static const color272727 = Color(0xff272727);
+  static const color424242 = Color(0xff424242);
+  static const color979797 = Color(0xff979797);
 }

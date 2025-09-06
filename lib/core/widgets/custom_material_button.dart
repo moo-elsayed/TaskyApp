@@ -12,6 +12,9 @@ class CustomMaterialButton extends StatelessWidget {
     this.textStyle,
     this.maxWidth = false,
     this.isLoading = false,
+    this.padding,
+    this.color,
+    this.side, this.borderRadius,
   });
 
   final void Function() onPressed;
@@ -19,17 +22,22 @@ class CustomMaterialButton extends StatelessWidget {
   final TextStyle? textStyle;
   final bool maxWidth;
   final bool isLoading;
+  final EdgeInsetsGeometry? padding;
+  final Color? color;
+  final BorderSide? side;
+  final BorderRadiusGeometry? borderRadius;
 
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
-      color: ColorsManager.color5F33E1,
+      color: color ?? ColorsManager.color5F33E1,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
       minWidth: maxWidth ? double.infinity : null,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(10.r),
+        borderRadius: borderRadius ?? BorderRadiusGeometry.circular(10.r),
+        side: side ?? BorderSide.none,
       ),
       padding: EdgeInsetsGeometry.symmetric(horizontal: 24.w, vertical: 12.h),
       onPressed: onPressed,

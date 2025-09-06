@@ -20,7 +20,7 @@ class TextFormFieldHelper extends StatefulWidget {
   final IconData? icon;
   final TextInputAction? action;
   final FocusNode? focusNode;
-
+  final EdgeInsetsGeometry? contentPadding;
   final BorderRadius? borderRadius;
   final bool? isMobile;
 
@@ -50,6 +50,7 @@ class TextFormFieldHelper extends StatefulWidget {
     this.focusNode,
     this.borderRadius,
     this.isMobile = true,
+    this.contentPadding,
   });
 
   @override
@@ -134,7 +135,9 @@ class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
                 ),
               )
             : widget.suffixWidget,
-        contentPadding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
+        contentPadding:
+            widget.contentPadding ??
+            EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
         border: outlineInputBorder(color: ColorsManager.colorBABABA, width: 1),
         enabledBorder: outlineInputBorder(
           color: ColorsManager.colorBABABA,
