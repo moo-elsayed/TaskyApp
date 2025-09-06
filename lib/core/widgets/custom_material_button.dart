@@ -14,7 +14,8 @@ class CustomMaterialButton extends StatelessWidget {
     this.isLoading = false,
     this.padding,
     this.color,
-    this.side, this.borderRadius,
+    this.side,
+    this.borderRadius,
   });
 
   final void Function() onPressed;
@@ -39,7 +40,9 @@ class CustomMaterialButton extends StatelessWidget {
         borderRadius: borderRadius ?? BorderRadiusGeometry.circular(10.r),
         side: side ?? BorderSide.none,
       ),
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 24.w, vertical: 12.h),
+      padding:
+          padding ??
+          EdgeInsetsGeometry.symmetric(horizontal: 24.w, vertical: 12.h),
       onPressed: onPressed,
       child: isLoading
           ? const CupertinoActivityIndicator(color: ColorsManager.white)
