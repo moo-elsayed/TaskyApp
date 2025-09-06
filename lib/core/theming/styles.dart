@@ -53,10 +53,34 @@ class TextStylesManager {
     color: ColorsManager.color817D8D,
   );
 
+  static TextStyle font16color5F33E1Regular = GoogleFonts.lato(
+    fontSize: 16.sp,
+    fontWeight: FontWeightHelper.regular,
+    color: ColorsManager.color5F33E1,
+  );
+
   static TextStyle font16WhiteBold = GoogleFonts.lato(
     fontSize: 16.sp,
     fontWeight: FontWeightHelper.bold,
     color: ColorsManager.white,
+  );
+
+  static TextStyle font16color404147Bold = GoogleFonts.lato(
+    fontSize: 16.sp,
+    fontWeight: FontWeightHelper.bold,
+    color: ColorsManager.color404147,
+  );
+
+  static TextStyle font20color404147Regular = GoogleFonts.lato(
+    fontSize: 20.sp,
+    fontWeight: FontWeightHelper.regular,
+    color: ColorsManager.color404147,
+  );
+
+  static TextStyle font20color404147Bold = GoogleFonts.lato(
+    fontSize: 20.sp,
+    fontWeight: FontWeightHelper.bold,
+    color: ColorsManager.color404147,
   );
 
   static TextStyle font32color404147Bold = GoogleFonts.lato(

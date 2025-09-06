@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tasky_app/core/theming/colors_manager.dart';
+import 'package:tasky_app/features/home/presentation/widgets/add_task_bottom_sheet.dart';
+import '../widgets/add_task_floating_action_button.dart';
 import '../widgets/home_app_bar.dart';
+import '../widgets/no_tasks_body.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -11,11 +15,19 @@ class HomeView extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(right: 12.w, left: 12.w, top: 12.h),
-          child: const Column(children: [HomeAppBar()]),
+          child: const Column(children: [HomeAppBar(), NoTasksBody()]),
         ),
+      ),
+      floatingActionButton: AddTaskFloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            backgroundColor: ColorsManager.white,
+            isScrollControlled: true,
+            context: context,
+            builder: (context) => const AddTaskBottomSheet(),
+          );
+        },
       ),
     );
   }
 }
-
-
