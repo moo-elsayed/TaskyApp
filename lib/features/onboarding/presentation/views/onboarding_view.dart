@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/routing/routes.dart';
 import 'package:tasky_app/core/widgets/custom_material_button.dart';
 import '../../../../core/helpers/shared_preferences_manager.dart';
+import '../../../../core/theming/colors_manager.dart';
 import '../../../../core/theming/styles.dart';
 import '../../data/models/slider_model.dart';
-import '../widgets/onboarding_indicator.dart';
 import '../widgets/onboarding_page_view.dart';
 
 class OnboardingView extends StatefulWidget {
@@ -21,6 +22,7 @@ class _OnboardingViewState extends State<OnboardingView> {
   int currentIndex = 0;
   late final PageController pageController;
   final List<SliderModel> slides = SliderModel.slides;
+  late final length = slides.length;
 
   @override
   void initState() {
@@ -50,9 +52,19 @@ class _OnboardingViewState extends State<OnboardingView> {
                 setState(() {});
               },
             ),
-            OnboardingIndicator(
-              slidesLength: slides.length,
-              currentIndex: currentIndex,
+            SmoothPageIndicator(
+              controller: pageController,
+              count: length,
+              axisDirection: Axis.horizontal,
+              effect: SwapEffect(
+                spacing: 8.w,
+                radius: 4.r,
+                dotWidth: 26.w,
+                dotHeight: 4.h,
+                paintStyle: PaintingStyle.fill,
+                dotColor: ColorsManager.colorAFAFAF,
+                activeDotColor: ColorsManager.color744EE5,
+              ),
             ),
             Gap(50.h),
             Text(
@@ -76,9 +88,9 @@ class _OnboardingViewState extends State<OnboardingView> {
       floatingActionButton: Padding(
         padding: EdgeInsets.only(right: 8.w, bottom: 32.h),
         child: CustomMaterialButton(
-          text: currentIndex < 2 ? 'Next' : 'Get Started',
+          text: currentIndex < length - 1 ? 'Next' : 'Get Started',
           onPressed: () {
-            if (currentIndex < 2) {
+            if (currentIndex < length - 1) {
               pageController.nextPage(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,

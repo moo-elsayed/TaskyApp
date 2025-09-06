@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasky_app/features/onboarding/presentation/widgets/custom_animation_widget.dart';
 import '../../data/models/slider_model.dart';
 
 class OnboardingPageView extends StatefulWidget {
@@ -31,8 +32,11 @@ class _OnboardingPageViewState extends State<OnboardingPageView> {
           widget.onPageChanged(currentIndex);
         },
         itemCount: widget.slides.length,
-        itemBuilder: (context, index) =>
-            Image.asset(widget.slides[index].image),
+        itemBuilder: (context, index) => CustomAnimationWidget(
+          index: index,
+          delay: (index + 1) * 50,
+          child: Image.asset(widget.slides[index].image),
+        ),
       ),
     );
   }
