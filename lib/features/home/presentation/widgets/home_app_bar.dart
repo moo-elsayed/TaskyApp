@@ -18,7 +18,7 @@ class HomeAppBar extends StatelessWidget {
     return BlocProvider(
       create: (context) => LogoutCubit(),
       child: Builder(
-        builder: (builderContext) => BlocListener<LogoutCubit, LogoutState>(
+        builder: (builderContext) => BlocListener<LogoutCubit, LogoutStates>(
           listener: (context, state) {
             if (state is LogoutSuccess) {
               context.pushNamedAndRemoveUntil(

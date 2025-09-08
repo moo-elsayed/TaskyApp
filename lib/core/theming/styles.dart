@@ -17,6 +17,12 @@ class TextStylesManager {
     fontWeight: FontWeightHelper.regular,
   );
 
+  static TextStyle font12color24252CRegular = GoogleFonts.lato(
+    fontSize: 12.sp,
+    color: ColorsManager.color24252C,
+    fontWeight: FontWeightHelper.regular,
+  );
+
   static TextStyle font14color7F7F7FRegular = GoogleFonts.dmSans(
     fontSize: 14.sp,
     color: ColorsManager.color7F7F7F,

@@ -5,10 +5,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tasky_app/core/helpers/keys.dart';
 import '../../domain/repos/auth_repo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../models/user.dart';
 
 class FirebaseAuthRepositoryImplementation implements AuthRepository {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Future googleSignIn() async {
     try {
@@ -37,14 +38,14 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      await _auth.signInWithCredential(credential);
 
       await _saveUserData(
         UserModel(
           email: googleUser.email,
           isVerified: true,
           name: googleUser.displayName,
-          id: FirebaseAuth.instance.currentUser!.uid,
+          id: _auth.currentUser!.uid,
         ),
       );
     } on FirebaseAuthException catch (e) {
@@ -62,7 +63,7 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
     required String password,
   }) async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final credential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -99,8 +100,10 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
     required String username,
   }) async {
     try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       await sendEmailVerification();
 
       await _saveUserData(
@@ -127,14 +130,14 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
 
   @override
   Future<void> forgetPassword(String email) async =>
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      await _auth.sendPasswordResetEmail(email: email);
 
   @override
   Future<void> sendEmailVerification() async =>
-      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+      await _auth.currentUser?.sendEmailVerification();
 
   Future<void> _saveUserData(UserModel userModel) async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
+    final userId = _auth.currentUser?.uid;
     final db = FirebaseFirestore.instance;
     final userDocumentRef = db.collection('users').doc(userId);
     await userDocumentRef.set(userModel.toJson(), SetOptions(merge: true));
