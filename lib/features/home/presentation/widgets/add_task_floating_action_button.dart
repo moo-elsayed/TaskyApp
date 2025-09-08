@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/colors_manager.dart';
 
 class AddTaskFloatingActionButton extends StatelessWidget {
@@ -13,7 +14,7 @@ class AddTaskFloatingActionButton extends StatelessWidget {
       shape: const CircleBorder(),
       elevation: 0,
       backgroundColor: ColorsManager.color24252C,
-      child: const Icon(Icons.add, color: ColorsManager.color5F33E1),
+      child: Icon(Icons.add, color: ColorsManager.color5F33E1,size: 30.r),
     );
   }
 }

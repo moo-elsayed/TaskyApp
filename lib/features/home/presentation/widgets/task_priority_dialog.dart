@@ -10,12 +10,12 @@ import 'package:tasky_app/features/home/presentation/widgets/custom_priority_ite
 class TaskPriorityDialog extends StatefulWidget {
   const TaskPriorityDialog({
     super.key,
-    required this.priority,
+    this.priority,
     required this.width,
     required this.onPrioritySelected,
   });
 
-  final int priority;
+  final int? priority;
   final double width;
   final Function(int value) onPrioritySelected;
 
@@ -24,7 +24,7 @@ class TaskPriorityDialog extends StatefulWidget {
 }
 
 class _TaskPriorityDialogState extends State<TaskPriorityDialog> {
-  late int selectedPriority = widget.priority;
+  late int selectedPriority = widget.priority ?? 1;
 
   @override
   Widget build(BuildContext context) {
