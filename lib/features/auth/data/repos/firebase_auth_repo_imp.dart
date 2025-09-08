@@ -40,9 +40,12 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       await _saveUserData(
-        name: googleUser.displayName!,
-        email: googleUser.email,
-        isVerified: true,
+        UserModel(
+          email: googleUser.email,
+          isVerified: true,
+          name: googleUser.displayName,
+          id: FirebaseAuth.instance.currentUser!.uid,
+        ),
       );
     } on FirebaseAuthException catch (e) {
       throw e.message!;
@@ -68,9 +71,12 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
         throw 'please verify your email';
       } else {
         await _saveUserData(
-          email: credential.user!.email!,
-          password: password,
-          isVerified: true,
+          UserModel(
+            email: credential.user!.email!,
+            password: password,
+            isVerified: true,
+            id: credential.user!.uid,
+          ),
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -93,16 +99,18 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
     required String username,
   }) async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       await sendEmailVerification();
+
       await _saveUserData(
-        name: username,
-        email: email,
-        password: password,
-        isVerified: false,
+        UserModel(
+          name: username,
+          email: email,
+          isVerified: false,
+          password: password,
+          id: credential.user!.uid,
+        ),
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -125,21 +133,10 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
   Future<void> sendEmailVerification() async =>
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
 
-  Future<void> _saveUserData({
-    String? name,
-    required String email,
-    String? password,
-    required bool isVerified,
-  }) async {
+  Future<void> _saveUserData(UserModel userModel) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     final db = FirebaseFirestore.instance;
-    final user = UserModel(
-      name: name,
-      email: email,
-      password: password,
-      isVerified: isVerified,
-    );
     final userDocumentRef = db.collection('users').doc(userId);
-    await userDocumentRef.set(user.toJson(), SetOptions(merge: true));
+    await userDocumentRef.set(userModel.toJson(), SetOptions(merge: true));
   }
 }

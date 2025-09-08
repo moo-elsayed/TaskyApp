@@ -1,4 +1,5 @@
 class UserModel {
+  final String id;
   final String? name;
   final String email;
   final String? password;
@@ -9,13 +10,15 @@ class UserModel {
     required this.email,
     this.password,
     required this.isVerified,
+    required this.id,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
     name: json['name'],
     email: json['email'],
     password: json['password'],
-    isVerified: json['isVerified'] == true,
+    isVerified: json['isVerified'],
+    id: json['id'],
   );
 
   Map<String, dynamic> toJson() => {
@@ -23,5 +26,6 @@ class UserModel {
     'email': email,
     'password': ?password,
     'isVerified': isVerified,
+    'id': id,
   };
 }
