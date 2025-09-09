@@ -1,12 +1,14 @@
-import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:tasky_app/core/helpers/vaildator.dart';
 import 'package:tasky_app/core/theming/colors_manager.dart';
 import 'package:tasky_app/core/theming/styles.dart';
+import 'package:tasky_app/features/home/data/models/task.dart';
+import 'package:tasky_app/features/home/presentation/managers/cubits/add_task_cubit/add_task_cubit.dart';
 import 'package:tasky_app/features/home/presentation/widgets/task_priority_dialog.dart';
 import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
 import 'custom_error_dialog.dart';
@@ -22,6 +24,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   DateTime? _currentDate;
+  TimeOfDay? _currentTime;
   final _formKey = GlobalKey<FormState>();
   int? _priority;
 
@@ -94,7 +97,43 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                         setState(() {});
                       }
                     },
+
                     child: _currentDate == null
+                        ? const Icon(
+                            CupertinoIcons.calendar,
+                            color: ColorsManager.color5F33E1,
+                          )
+                        : buildContainer(
+                            child: Row(
+                              spacing: 5.w,
+                              children: [
+                                const Icon(
+                                  CupertinoIcons.calendar,
+                                  color: ColorsManager.color5F33E1,
+                                ),
+                                Text(
+                                  getCurrentData(),
+                                  style: TextStylesManager
+                                      .font12color24252CRegular,
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+
+                        initialTime: _currentTime ?? TimeOfDay.now(),
+                      );
+
+                      if (pickedTime != null && pickedTime != _currentTime) {
+                        _currentTime = pickedTime;
+                        setState(() {});
+                      }
+                    },
+                    child: _currentTime == null
                         ? SvgPicture.asset('assets/icons/time-icon.svg')
                         : buildContainer(
                             child: Row(
@@ -102,7 +141,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                               children: [
                                 SvgPicture.asset('assets/icons/time-icon.svg'),
                                 Text(
-                                  '${_currentDate!.day}/${_currentDate!.month}/${_currentDate!.year}',
+                                  _getCurrentTime(),
                                   style: TextStylesManager
                                       .font12color24252CRegular,
                                 ),
@@ -142,8 +181,23 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   GestureDetector(
                     onTap: () {
                       if (_formKey.currentState!.validate()) {
-                        if (_currentDate != null && _priority != null) {
-                          log('Hi');
+                        if (_currentDate != null &&
+                            _priority != null &&
+                            _currentTime != null) {
+                          context.read<AddTaskCubit>().addTask(
+                            TaskModel(
+                              dateTime: DateTime(
+                                _currentDate!.year,
+                                _currentDate!.month,
+                                _currentDate!.day,
+                                _currentTime!.hour,
+                                _currentTime!.minute,
+                              ),
+                              name: _titleController.text.trim(),
+                              description: _descriptionController.text.trim(),
+                              priority: _priority!,
+                            ),
+                          );
                         } else {
                           showErrorDialog(context);
                         }
@@ -160,10 +214,19 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     );
   }
 
+  String getCurrentData() =>
+      '${_currentDate!.day}/${_currentDate!.month}/${_currentDate!.year}';
+
+  String _getCurrentTime() =>
+      '${_currentTime!.hour.toString().padLeft(2, '0')}:${_currentTime!.minute.toString().padLeft(2, '0')}';
+
   void showErrorDialog(BuildContext context) => showCupertinoDialog(
     context: context,
     barrierDismissible: true,
-    builder: (context) => const CustomErrorDialog(),
+    builder: (context) => const CustomErrorDialog(
+      title: 'Error',
+      description: 'Please select a date, time and priority',
+    ),
   );
 
   Container buildContainer({required Widget child}) => Container(

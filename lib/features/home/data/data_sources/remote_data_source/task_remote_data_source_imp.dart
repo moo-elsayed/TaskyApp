@@ -4,32 +4,37 @@ import 'package:tasky_app/features/home/data/data_sources/remote_data_source/tas
 import 'package:tasky_app/features/home/data/models/task.dart';
 
 class TaskRemoteDataSourceImplementation implements TaskRemoteDataSource {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  CollectionReference<Map<String, dynamic>> _tasksCollection() =>
-      _db.collection('users').doc(_auth.currentUser!.uid).collection('tasks');
+  CollectionReference<TaskModel> _tasksCollection() => FirebaseFirestore
+      .instance
+      .collection('users')
+      .doc(_auth.currentUser!.uid)
+      .collection('tasks')
+      .withConverter<TaskModel>(
+        fromFirestore: (snapshot, _) => TaskModel.fromJson(snapshot.data()!),
+        toFirestore: (task, _) => task.toJson(),
+      );
 
   @override
-  Future<void> addTask(TaskModel task) async =>
-      await _tasksCollection().add(task.toMap());
+  Future<void> addTask(TaskModel task) async {
+    String taskId = _tasksCollection().doc().id;
+    task.id = taskId;
+    await _tasksCollection().doc(taskId).set(task);
+  }
 
   @override
   Future<List<TaskModel>> getAllTasks() async {
-    final snapshot = await _tasksCollection()
-        .orderBy('priority', descending: false)
-        .get();
+    final snapshot = await _tasksCollection().get();
     if (snapshot.docs.isEmpty) {
       return [];
     }
-    return snapshot.docs.map((doc) {
-      return TaskModel.fromMap(doc.data(), doc.id);
-    }).toList();
+    return snapshot.docs.map((doc) => doc.data()).toList();
   }
 
   @override
   Future<void> editTask(TaskModel task) async =>
-      await _tasksCollection().doc(task.id).update(task.toMap());
+      await _tasksCollection().doc(task.id).update(task.toJson());
 
   @override
   Future<void> deleteTask(String taskId) async =>

@@ -1,34 +1,39 @@
 class TaskModel {
-  final String? id;
+  String? id;
   final String name;
   final String? description;
-  final DateTime date;
+  final DateTime dateTime;
   final int priority;
+  final bool? isCompleted;
 
   TaskModel({
     this.id,
+    required this.dateTime,
     required this.name,
     this.description,
-    required this.date,
     required this.priority,
+    this.isCompleted = false,
   });
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'description': ?description,
-      'date': date.toIso8601String(),
+      'dateTime': dateTime.microsecondsSinceEpoch,
       'priority': priority,
+      'isCompleted': isCompleted,
     };
   }
 
-  factory TaskModel.fromMap(Map<String, dynamic> map, String documentId) {
+  factory TaskModel.fromJson(Map<String, dynamic> map) {
     return TaskModel(
-      id: documentId,
+      id: map['id'],
       name: map['name'] ?? '',
-      description: map['description'],
-      date: DateTime.parse(map['date']),
+      description: map['description'] ?? "",
+      dateTime: DateTime.fromMicrosecondsSinceEpoch(map['dateTime']),
       priority: map['priority']?.toInt() ?? 1,
+      isCompleted: map['isCompleted'] ?? false,
     );
   }
 }

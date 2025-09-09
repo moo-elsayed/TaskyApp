@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tasky_app/core/routing/app_router.dart';
 import 'package:tasky_app/features/auth/data/repos/firebase_auth_repo_imp.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_cubit.dart';
+import 'core/helpers/dependency_injection.dart';
 import 'core/routing/routes.dart';
 
 class TaskyApp extends StatelessWidget {
@@ -18,7 +19,8 @@ class TaskyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       child: BlocProvider(
-        create: (context) => AuthCubit(FirebaseAuthRepositoryImplementation()),
+        create: (context) =>
+            AuthCubit(getIt.get<FirebaseAuthRepositoryImplementation>()),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           initialRoute: Routes.animatedSplashView,

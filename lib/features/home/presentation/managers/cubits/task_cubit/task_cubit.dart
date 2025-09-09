@@ -8,16 +8,6 @@ class TaskCubit extends Cubit<TaskStates> {
 
   final TaskRepository _taskRepository;
 
-  Future<void> addTask(TaskModel task) async {
-    emit(AddTaskLoading());
-    try {
-      await _taskRepository.addTask(task);
-      emit(AddTaskSuccess());
-    } catch (e) {
-      emit(AddTaskFailure(e.toString()));
-    }
-  }
-
   Future<void> deleteTask(String taskId) async {
     emit(DeleteTaskLoading());
     try {

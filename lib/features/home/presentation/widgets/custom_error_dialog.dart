@@ -4,17 +4,24 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomErrorDialog extends StatelessWidget {
-  const CustomErrorDialog({super.key});
+  const CustomErrorDialog({
+    super.key,
+    required this.title,
+    required this.description,
+  });
+
+  final String title;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
     return CupertinoAlertDialog(
       title: Padding(
         padding: EdgeInsets.only(bottom: 8.h),
-        child: Text('Error', style: GoogleFonts.lato(color: Colors.red)),
+        child: Text(title, style: GoogleFonts.lato(color: Colors.red)),
       ),
       content: Text(
-        'Please select a date and priority',
+        description,
         style: GoogleFonts.lato(),
       ),
     );
