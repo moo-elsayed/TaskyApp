@@ -4,13 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/helpers/vaildator.dart';
 import 'package:tasky_app/core/theming/colors_manager.dart';
 import 'package:tasky_app/core/theming/styles.dart';
 import 'package:tasky_app/features/home/data/models/task.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/add_task_cubit/add_task_cubit.dart';
+import 'package:tasky_app/features/home/presentation/managers/cubits/add_task_cubit/add_task_states.dart';
 import 'package:tasky_app/features/home/presentation/widgets/task_priority_dialog.dart';
 import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
+import '../../../../core/utils/functions.dart';
+import '../managers/cubits/task_cubit/task_cubit.dart';
+import 'custom_data_container.dart';
 import 'custom_error_dialog.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
@@ -37,204 +42,237 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: 25.w,
-          right: 25.w,
-          top: 25.h,
-          bottom: 17.h + MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Add Task', style: TextStylesManager.font20color404147Bold),
-              Gap(14.h),
-              TextFormFieldHelper(
-                controller: _titleController,
-                borderRadius: BorderRadius.circular(4.r),
-                hint: 'Title',
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 8.h,
-                  horizontal: 16.w,
-                ),
-                action: TextInputAction.next,
-                onValidate: Validator.validateName,
+    return BlocConsumer<AddTaskCubit, AddTaskStates>(
+      listener: (context, state) {
+        if (state is AddTaskSuccess) {
+          context.read<TaskCubit>().getAllTasks();
+          context.pop();
+        }
+        if (state is AddTaskFailure) {
+          showErrorDialog(context: context, errorMessage: state.errorMessage);
+        }
+      },
+      builder: (context, state) => Stack(
+        children: [
+          GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 25.w,
+                right: 25.w,
+                top: 25.h,
+                bottom: 17.h + MediaQuery.of(context).viewInsets.bottom,
               ),
-              Gap(12.h),
-              TextFormFieldHelper(
-                controller: _descriptionController,
-                borderRadius: BorderRadius.circular(4.r),
-                hint: 'Description',
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 8.h,
-                  horizontal: 16.w,
-                ),
-                action: TextInputAction.done,
-              ),
-              Gap(20.h),
-              Row(
-                spacing: 12.w,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        barrierDismissible: false,
-                        firstDate: DateTime.now(),
-                        initialDate: _currentDate ?? DateTime.now(),
-                        lastDate: DateTime.now().add(
-                          const Duration(days: 365 * 5),
-                        ),
-                      );
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Add Task',
+                      style: TextStylesManager.font20color404147Bold,
+                    ),
+                    Gap(14.h),
+                    TextFormFieldHelper(
+                      controller: _titleController,
+                      borderRadius: BorderRadius.circular(4.r),
+                      hint: 'Title',
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 8.h,
+                        horizontal: 16.w,
+                      ),
+                      action: TextInputAction.next,
+                      onValidate: Validator.validateName,
+                    ),
+                    Gap(12.h),
+                    TextFormFieldHelper(
+                      controller: _descriptionController,
+                      borderRadius: BorderRadius.circular(4.r),
+                      hint: 'Description',
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 8.h,
+                        horizontal: 16.w,
+                      ),
+                      action: TextInputAction.done,
+                    ),
+                    Gap(20.h),
+                    Row(
+                      spacing: 12.w,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              barrierDismissible: false,
+                              firstDate: DateTime.now(),
+                              initialDate: _currentDate ?? DateTime.now(),
+                              lastDate: DateTime.now().add(
+                                const Duration(days: 365 * 5),
+                              ),
+                            );
 
-                      if (pickedDate != null && pickedDate != _currentDate) {
-                        _currentDate = pickedDate;
-                        setState(() {});
-                      }
-                    },
+                            if (pickedDate != null &&
+                                pickedDate != _currentDate) {
+                              _currentDate = pickedDate;
+                              setState(() {});
+                            }
+                          },
 
-                    child: _currentDate == null
-                        ? const Icon(
-                            CupertinoIcons.calendar,
-                            color: ColorsManager.color5F33E1,
-                          )
-                        : buildContainer(
-                            child: Row(
-                              spacing: 5.w,
-                              children: [
-                                const Icon(
+                          child: _currentDate == null
+                              ? const Icon(
                                   CupertinoIcons.calendar,
                                   color: ColorsManager.color5F33E1,
+                                )
+                              : CustomDataContainer(
+                                  icon: Icon(
+                                    CupertinoIcons.calendar,
+                                    color: ColorsManager.color5F33E1,
+                                    size: 14.r,
+                                  ),
+                                  text: getDate(_currentDate!),
                                 ),
-                                Text(
-                                  getCurrentData(),
-                                  style: TextStylesManager
-                                      .font12color24252CRegular,
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            TimeOfDay? pickedTime = await showTimePicker(
+                              context: context,
+
+                              initialTime: _currentTime ?? TimeOfDay.now(),
+                            );
+
+                            if (pickedTime != null &&
+                                pickedTime != _currentTime) {
+                              _currentTime = pickedTime;
+                              setState(() {});
+                            }
+                          },
+                          child: _currentTime == null
+                              ? SvgPicture.asset('assets/icons/time-icon.svg')
+                              : CustomDataContainer(
+                                  icon: SvgPicture.asset(
+                                    'assets/icons/time-icon.svg',
+                                    height: 14.h,
+                                    width: 14.w,
+                                  ),
+                                  text: getTime(_currentTime!),
                                 ),
-                              ],
+                        ),
+                        GestureDetector(
+                          onTap: () => showCupertinoDialog(
+                            context: context,
+                            builder: (context) => TaskPriorityDialog(
+                              width: MediaQuery.widthOf(context),
+                              priority: _priority,
+                              onPrioritySelected: (value) {
+                                _priority = value;
+                                setState(() {});
+                              },
                             ),
                           ),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      TimeOfDay? pickedTime = await showTimePicker(
-                        context: context,
-
-                        initialTime: _currentTime ?? TimeOfDay.now(),
-                      );
-
-                      if (pickedTime != null && pickedTime != _currentTime) {
-                        _currentTime = pickedTime;
-                        setState(() {});
-                      }
-                    },
-                    child: _currentTime == null
-                        ? SvgPicture.asset('assets/icons/time-icon.svg')
-                        : buildContainer(
-                            child: Row(
-                              spacing: 5.w,
-                              children: [
-                                SvgPicture.asset('assets/icons/time-icon.svg'),
-                                Text(
-                                  _getCurrentTime(),
-                                  style: TextStylesManager
-                                      .font12color24252CRegular,
+                          child: _priority == null
+                              ? SvgPicture.asset('assets/icons/flag-icon.svg')
+                              : CustomDataContainer(
+                                  icon: SvgPicture.asset(
+                                    'assets/icons/flag-icon.svg',
+                                    height: 14.h,
+                                    width: 14.w,
+                                  ),
+                                  text: '$_priority',
                                 ),
-                              ],
-                            ),
-                          ),
-                  ),
-                  GestureDetector(
-                    onTap: () => showCupertinoDialog(
-                      context: context,
-                      builder: (context) => TaskPriorityDialog(
-                        width: MediaQuery.widthOf(context),
-                        priority: _priority,
-                        onPrioritySelected: (value) {
-                          _priority = value;
-                          setState(() {});
-                        },
-                      ),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            if (_formKey.currentState!.validate()) {
+                              if (_currentDate != null &&
+                                  _priority != null &&
+                                  _currentTime != null) {
+                                context.read<AddTaskCubit>().addTask(
+                                  TaskModel(
+                                    dateTime: DateTime(
+                                      _currentDate!.year,
+                                      _currentDate!.month,
+                                      _currentDate!.day,
+                                      _currentTime!.hour,
+                                      _currentTime!.minute,
+                                    ),
+                                    name: _titleController.text.trim(),
+                                    description: _descriptionController.text
+                                        .trim(),
+                                    priority: _priority!,
+                                  ),
+                                );
+                              } else {
+                                showErrorDialog(
+                                  context: context,
+                                  errorMessage:
+                                      _generateValidationErrorMessage(),
+                                );
+                              }
+                            }
+                          },
+                          child: SvgPicture.asset('assets/icons/send-icon.svg'),
+                        ),
+                      ],
                     ),
-                    child: _priority == null
-                        ? SvgPicture.asset('assets/icons/flag-icon.svg')
-                        : buildContainer(
-                            child: Row(
-                              spacing: 5.w,
-                              children: [
-                                SvgPicture.asset('assets/icons/flag-icon.svg'),
-                                Text(
-                                  '$_priority',
-                                  style: TextStylesManager
-                                      .font12color24252CRegular,
-                                ),
-                              ],
-                            ),
-                          ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      if (_formKey.currentState!.validate()) {
-                        if (_currentDate != null &&
-                            _priority != null &&
-                            _currentTime != null) {
-                          context.read<AddTaskCubit>().addTask(
-                            TaskModel(
-                              dateTime: DateTime(
-                                _currentDate!.year,
-                                _currentDate!.month,
-                                _currentDate!.day,
-                                _currentTime!.hour,
-                                _currentTime!.minute,
-                              ),
-                              name: _titleController.text.trim(),
-                              description: _descriptionController.text.trim(),
-                              priority: _priority!,
-                            ),
-                          );
-                        } else {
-                          showErrorDialog(context);
-                        }
-                      }
-                    },
-                    child: SvgPicture.asset('assets/icons/send-icon.svg'),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ),
+          if (state is AddTaskLoading)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: const Center(
+                  child: CupertinoActivityIndicator(color: Colors.white),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
 
-  String getCurrentData() =>
-      '${_currentDate!.day}/${_currentDate!.month}/${_currentDate!.year}';
+  String _generateValidationErrorMessage() {
+    final List<String> missingItems = [];
 
-  String _getCurrentTime() =>
-      '${_currentTime!.hour.toString().padLeft(2, '0')}:${_currentTime!.minute.toString().padLeft(2, '0')}';
+    if (_currentDate == null) {
+      missingItems.add('date');
+    }
+    if (_currentTime == null) {
+      missingItems.add('time');
+    }
+    if (_priority == null) {
+      missingItems.add('priority');
+    }
 
-  void showErrorDialog(BuildContext context) => showCupertinoDialog(
+    if (missingItems.isEmpty) {
+      return 'An unknown validation error occurred.'; // Fallback
+    }
+
+    String message;
+    if (missingItems.length == 1) {
+      message = missingItems.first;
+    } else {
+      String lastItem = missingItems.removeLast();
+      message = '${missingItems.join(', ')} and $lastItem';
+    }
+
+    return 'Please select a $message.';
+  }
+
+  void showErrorDialog({
+    required BuildContext context,
+    required String errorMessage,
+  }) => showCupertinoDialog(
     context: context,
     barrierDismissible: true,
-    builder: (context) => const CustomErrorDialog(
-      title: 'Error',
-      description: 'Please select a date, time and priority',
-    ),
-  );
-
-  Container buildContainer({required Widget child}) => Container(
-    padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(4.r),
-      border: Border.all(color: ColorsManager.color5F33E1),
-    ),
-    child: child,
+    builder: (context) =>
+        CustomErrorDialog(title: 'Error', description: errorMessage),
   );
 }

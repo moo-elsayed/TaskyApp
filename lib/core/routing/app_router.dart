@@ -3,6 +3,8 @@ import 'package:tasky_app/core/routing/routes.dart';
 import 'package:tasky_app/features/auth/data/models/login_args.dart';
 import 'package:tasky_app/features/auth/presentation/views/login_view.dart';
 import 'package:tasky_app/features/auth/presentation/views/register_view.dart';
+import 'package:tasky_app/features/home/data/models/task.dart';
+import 'package:tasky_app/features/home/presentation/views/edit_task_view.dart';
 import 'package:tasky_app/features/home/presentation/views/home_view.dart';
 import 'package:tasky_app/features/onboarding/presentation/views/onboarding_view.dart';
 import '../../animated_splash_screen.dart';
@@ -24,6 +26,9 @@ class AppRouter {
         return CupertinoPageRoute(builder: (_) => const RegisterView());
       case Routes.homeView:
         return CupertinoPageRoute(builder: (_) => const HomeView());
+      case Routes.editTaskView:
+        final args = arguments as TaskModel;
+        return CupertinoPageRoute(builder: (_) => EditTaskView(task: args));
       default:
         return null;
     }

@@ -29,6 +29,12 @@ class TextStylesManager {
     fontWeight: FontWeightHelper.regular,
   );
 
+  static TextStyle font14color6E6A7CRegular = GoogleFonts.dmSans(
+    fontSize: 14.sp,
+    color: ColorsManager.color6E6A7C,
+    fontWeight: FontWeightHelper.regular,
+  );
+
   static TextStyle font15googleSignInTextColorBold = GoogleFonts.lato(
     fontSize: 15.sp,
     fontWeight: FontWeightHelper.bold,
@@ -65,6 +71,18 @@ class TextStylesManager {
     color: ColorsManager.color5F33E1,
   );
 
+  static TextStyle font16color6E6A7CRegular = GoogleFonts.lato(
+    fontSize: 16.sp,
+    fontWeight: FontWeightHelper.regular,
+    color: ColorsManager.color6E6A7C,
+  );
+
+  static TextStyle font16color24252CRegular = GoogleFonts.lato(
+    fontSize: 16.sp,
+    fontWeight: FontWeightHelper.regular,
+    color: ColorsManager.color24252C,
+  );
+
   static TextStyle font16WhiteBold = GoogleFonts.lato(
     fontSize: 16.sp,
     fontWeight: FontWeightHelper.bold,
@@ -81,6 +99,12 @@ class TextStylesManager {
     fontSize: 20.sp,
     fontWeight: FontWeightHelper.regular,
     color: ColorsManager.color404147,
+  );
+
+  static TextStyle font20color24252CRegular = GoogleFonts.lato(
+    fontSize: 20.sp,
+    fontWeight: FontWeightHelper.regular,
+    color: ColorsManager.color24252C,
   );
 
   static TextStyle font20color404147Bold = GoogleFonts.lato(

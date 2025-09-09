@@ -4,7 +4,7 @@ class TaskModel {
   final String? description;
   final DateTime dateTime;
   final int priority;
-  final bool? isCompleted;
+  bool? isCompleted;
 
   TaskModel({
     this.id,
