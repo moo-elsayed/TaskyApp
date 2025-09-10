@@ -51,4 +51,15 @@ class TaskRepositoryImplementation implements TaskRepository {
       throw ('An unexpected error occurred: ${e.toString()}');
     }
   }
+
+  @override
+  Future<List<TaskModel>> search(String name) async {
+    try {
+      return await _remoteDataSource.search(name);
+    } on FirebaseException catch (e) {
+      throw ('Failed to get tasks: ${e.message}');
+    } catch (e) {
+      throw ('An unexpected error occurred: ${e.toString()}');
+    }
+  }
 }

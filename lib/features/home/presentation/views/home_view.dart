@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,11 +30,32 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   List<TaskModel> tasks = [];
+  List<TaskModel> searchList = [];
+  bool showSearchTextFormFiled = false;
+  Timer? _debounce;
+  final _searchController = TextEditingController();
+
+  void _filterTasks(String? taskName) {
+    if (taskName!.isEmpty) return;
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+
+    _debounce = Timer(
+      const Duration(milliseconds: 500),
+      () async => context.read<TaskCubit>().search(taskName),
+    );
+  }
 
   @override
   void initState() {
     super.initState();
     context.read<TaskCubit>().getAllTasks();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,15 +65,20 @@ class _HomeViewState extends State<HomeView> {
         listener: (context, state) {
           if (state is GetAllTasksSuccess) {
             tasks = state.tasks;
-          }
-          if (state is GetAllTasksFailure) {
+            if (state.tasks.isNotEmpty) {
+              showSearchTextFormFiled = true;
+            } else {
+              showSearchTextFormFiled = false;
+            }
+          } else if (state is GetAllTasksFailure) {
             showCustomToast(
               context: context,
               message: state.errorMessage,
               contentType: ContentType.failure,
             );
-          }
-          if (state is EditTaskFailure) {
+          } else if (state is SearchTaskSuccess) {
+            searchList = state.tasks;
+          } else if (state is EditTaskFailure) {
             showCustomToast(
               context: context,
               message: state.errorMessage,
@@ -66,8 +93,11 @@ class _HomeViewState extends State<HomeView> {
               child: Column(
                 children: [
                   const HomeAppBar(),
-                  state is GetAllTasksSuccess
-                      ? tasks.isEmpty
+                  state is GetAllTasksSuccess ||
+                          state is GetAllTasksLoading ||
+                          state is SearchTaskSuccess ||
+                          state is SearchTaskLoading
+                      ? tasks.isEmpty && state is GetAllTasksSuccess
                             ? const NoTasksBody()
                             : Expanded(
                                 child: GestureDetector(
@@ -80,47 +110,64 @@ class _HomeViewState extends State<HomeView> {
                                     child: Column(
                                       children: [
                                         Gap(26.h),
-                                        TextFormFieldHelper(
-                                          hint: 'Search for your task...',
-                                          prefixIcon: SvgPicture.asset(
-                                            'assets/icons/search-icon.svg',
-                                            height: 24.h,
-                                            width: 24.w,
-                                            fit: BoxFit.scaleDown,
-                                          ),
-                                          contentPadding: EdgeInsets.all(12.r),
-                                          borderRadius: BorderRadius.circular(
-                                            10.r,
-                                          ),
-                                          borderColor:
-                                              ColorsManager.color6E6A7C,
-                                          action: TextInputAction.search,
-                                        ),
+                                        !showSearchTextFormFiled
+                                            ? const LoadingTextFormField()
+                                            : TextFormFieldHelper(
+                                                controller: _searchController,
+                                                hint: 'Search for your task...',
+                                                prefixIcon: SvgPicture.asset(
+                                                  'assets/icons/search-icon.svg',
+                                                  height: 24.h,
+                                                  width: 24.w,
+                                                  fit: BoxFit.scaleDown,
+                                                ),
+                                                contentPadding: EdgeInsets.all(
+                                                  12.r,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(10.r),
+                                                borderColor:
+                                                    ColorsManager.color6E6A7C,
+                                                action: TextInputAction.search,
+                                                onChanged: _filterTasks,
+                                                suffixWidget:
+                                                    _searchController
+                                                        .text
+                                                        .isNotEmpty
+                                                    ? GestureDetector(
+                                                        onTap: () {
+                                                          _searchController
+                                                              .clear();
+                                                          setState(() {});
+                                                        },
+                                                        child: Icon(
+                                                          Icons.clear,
+                                                          color: ColorsManager
+                                                              .color6E6A7C,
+                                                          size: 22.r,
+                                                        ),
+                                                      )
+                                                    : null,
+                                              ),
                                         Gap(26.h),
-                                        Expanded(
-                                          child: TasksListView(tasks: tasks),
-                                        ),
+                                        state is GetAllTasksLoading ||
+                                                state is SearchTaskLoading
+                                            ? const LoadingTasksListView()
+                                            : Expanded(
+                                                child: TasksListView(
+                                                  tasks:
+                                                      _searchController
+                                                          .text
+                                                          .isNotEmpty
+                                                      ? searchList
+                                                      : tasks,
+                                                ),
+                                              ),
                                       ],
                                     ),
                                   ),
                                 ),
                               )
-                      : state is GetAllTasksLoading
-                      ? Expanded(
-                          child: Padding(
-                            padding: EdgeInsetsGeometry.symmetric(
-                              horizontal: 12.w,
-                            ),
-                            child: Column(
-                              children: [
-                                Gap(26.h),
-                                const LoadingTextFormField(),
-                                Gap(26.h),
-                                const Expanded(child: LoadingTasksListView()),
-                              ],
-                            ),
-                          ),
-                        )
                       : const SizedBox.shrink(),
                 ],
               ),
@@ -128,20 +175,22 @@ class _HomeViewState extends State<HomeView> {
           );
         },
       ),
-      floatingActionButton: AddTaskFloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            backgroundColor: ColorsManager.white,
-            isScrollControlled: true,
-            context: context,
-            builder: (context) => BlocProvider(
-              create: (context) =>
-                  AddTaskCubit(getIt.get<TaskRepositoryImplementation>()),
-              child: const AddTaskBottomSheet(),
-            ),
-          );
-        },
-      ),
+      floatingActionButton: MediaQuery.of(context).viewInsets.bottom == 0
+          ? AddTaskFloatingActionButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  backgroundColor: ColorsManager.white,
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) => BlocProvider(
+                    create: (context) =>
+                        AddTaskCubit(getIt.get<TaskRepositoryImplementation>()),
+                    child: const AddTaskBottomSheet(),
+                  ),
+                );
+              },
+            )
+          : null,
     );
   }
 }

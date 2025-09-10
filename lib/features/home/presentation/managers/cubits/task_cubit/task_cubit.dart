@@ -37,4 +37,14 @@ class TaskCubit extends Cubit<TaskStates> {
       emit(GetAllTasksFailure(e.toString()));
     }
   }
+
+  Future search(String name) async {
+    emit(SearchTaskLoading());
+    try {
+      final tasks = await _taskRepository.search(name);
+      emit(SearchTaskSuccess(tasks));
+    } catch (e) {
+      emit(SearchTaskFailure(e.toString()));
+    }
+  }
 }

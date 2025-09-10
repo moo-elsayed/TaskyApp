@@ -37,3 +37,17 @@ class GetAllTasksFailure extends TaskStates {
 
   GetAllTasksFailure(this.errorMessage);
 }
+
+class SearchTaskLoading extends TaskStates {}
+
+class SearchTaskSuccess extends TaskStates {
+  final List<TaskModel> tasks;
+
+  SearchTaskSuccess(this.tasks);
+}
+
+class SearchTaskFailure extends TaskStates {
+  final String errorMessage;
+
+  SearchTaskFailure(this.errorMessage);
+}

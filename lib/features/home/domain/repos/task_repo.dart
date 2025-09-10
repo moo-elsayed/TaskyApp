@@ -8,4 +8,6 @@ abstract class TaskRepository {
   Future<void> deleteTask(String taskId);
 
   Future<List<TaskModel>> getAllTasks();
+
+  Future<List<TaskModel>> search(String name);
 }

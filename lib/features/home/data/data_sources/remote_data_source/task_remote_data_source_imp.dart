@@ -25,7 +25,7 @@ class TaskRemoteDataSourceImplementation implements TaskRemoteDataSource {
 
   @override
   Future<List<TaskModel>> getAllTasks() async {
-    final snapshot = await _tasksCollection().get();
+    final snapshot = await _tasksCollection().orderBy('priority').get();
     if (snapshot.docs.isEmpty) {
       return [];
     }
@@ -39,4 +39,13 @@ class TaskRemoteDataSourceImplementation implements TaskRemoteDataSource {
   @override
   Future<void> deleteTask(String taskId) async =>
       await _tasksCollection().doc(taskId).delete();
+
+  @override
+  Future<List<TaskModel>> search(String name) async {
+    return await _tasksCollection()
+        .where("name", isGreaterThanOrEqualTo: name)
+        .where("name", isLessThanOrEqualTo: '$name\uf8ff')
+        .get()
+        .then((value) => value.docs.map((e) => e.data()).toList());
+  }
 }
