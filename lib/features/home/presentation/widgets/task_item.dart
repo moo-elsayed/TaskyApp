@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,6 +20,8 @@ class TaskItem extends StatefulWidget {
 }
 
 class _TaskItemState extends State<TaskItem> {
+  late bool _isCompleted = widget.task.isCompleted ?? false;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -36,10 +36,13 @@ class _TaskItemState extends State<TaskItem> {
             border: Border.all(color: ColorsManager.color6E6A7C),
           ),
           child: CustomListTile(
-            task: widget.task,
+            name: widget.task.name,
+            dateTime: widget.task.dateTime,
             onChanged: (isCompleted) {
-              log(isCompleted.toString());
+              _isCompleted = isCompleted;
+              setState(() {});
             },
+            isCompleted: _isCompleted,
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

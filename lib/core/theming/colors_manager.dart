@@ -20,4 +20,5 @@ class ColorsManager {
   static const color424242 = Color(0xff424242);
   static const color979797 = Color(0xff979797);
   static const colorE1E0E3 = Color(0xffE1E0E3);
+  static const resetButtonColor = Color(0xffF5F5F5);
 }
