@@ -12,7 +12,7 @@ class TasksListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: EdgeInsets.symmetric(vertical: 18.h,horizontal: 12.w),
+      // padding: EdgeInsets.symmetric(vertical: 18.h,horizontal: 12.w),
       itemBuilder: (context, index) {
         var task = tasks[index];
         return TaskItem(task: task);

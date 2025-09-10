@@ -12,7 +12,6 @@ import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
 import 'package:tasky_app/features/auth/data/models/login_args.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_cubit.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_states.dart';
-import '../../../../core/theming/colors_manager.dart';
 import '../../../../core/widgets/awesome_dialog.dart';
 import '../widgets/footer.dart';
 
@@ -42,7 +41,6 @@ class _LoginViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorsManager.white,
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),

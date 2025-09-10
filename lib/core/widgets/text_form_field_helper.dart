@@ -23,6 +23,7 @@ class TextFormFieldHelper extends StatefulWidget {
   final EdgeInsetsGeometry? contentPadding;
   final BorderRadius? borderRadius;
   final bool? isMobile;
+  final Color? borderColor;
 
   const TextFormFieldHelper({
     super.key,
@@ -51,6 +52,7 @@ class TextFormFieldHelper extends StatefulWidget {
     this.borderRadius,
     this.isMobile = true,
     this.contentPadding,
+    this.borderColor,
   });
 
   @override
@@ -140,11 +142,11 @@ class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
             EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
         border: outlineInputBorder(color: ColorsManager.colorBABABA, width: 1),
         enabledBorder: outlineInputBorder(
-          color: ColorsManager.colorBABABA,
+          color: widget.borderColor ?? ColorsManager.colorBABABA,
           width: 1,
         ),
         focusedBorder: outlineInputBorder(
-          color: ColorsManager.colorBABABA,
+          color: widget.borderColor ?? ColorsManager.colorBABABA,
           width: 1,
         ),
         errorBorder: outlineInputBorder(color: Colors.red, width: 1),

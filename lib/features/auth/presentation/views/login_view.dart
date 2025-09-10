@@ -15,7 +15,6 @@ import 'package:tasky_app/features/auth/data/models/login_args.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_cubit.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_states.dart';
 import 'package:tasky_app/features/auth/presentation/widgets/sign_in_with_google_button.dart';
-import '../../../../core/theming/colors_manager.dart';
 import '../widgets/footer.dart';
 
 class LoginView extends StatefulWidget {
@@ -91,7 +90,6 @@ class _LoginViewState extends State<LoginView> {
         progressIndicator: const CupertinoActivityIndicator(),
         opacity: 0.25,
         child: Scaffold(
-          backgroundColor: ColorsManager.white,
           body: SafeArea(
             child: GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
