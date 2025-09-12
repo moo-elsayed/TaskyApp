@@ -17,7 +17,7 @@ class NoTasksBody extends StatelessWidget {
         Image.asset('assets/images/no-tasks-image.png'),
         Gap(15.h),
         Text(
-          'What do you want to do today?',
+          'What do you want to do?',
           style: TextStylesManager.font20color404147Regular,
         ),
         Gap(10.h),

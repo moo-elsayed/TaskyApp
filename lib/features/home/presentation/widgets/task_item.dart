@@ -1,9 +1,11 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/routing/routes.dart';
+import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_cubit.dart';
 import 'package:tasky_app/features/home/presentation/widgets/custom_data_container.dart';
 import 'package:tasky_app/features/home/presentation/widgets/custom_list_tile.dart';
 import '../../../../core/theming/colors_manager.dart';
@@ -11,9 +13,10 @@ import '../../../../core/theming/styles.dart';
 import '../../data/models/task.dart';
 
 class TaskItem extends StatefulWidget {
-  const TaskItem({super.key, required this.task});
+  const TaskItem({super.key, required this.task, required this.onChanged});
 
   final TaskModel task;
+  final Function() onChanged;
 
   @override
   State<TaskItem> createState() => _TaskItemState();
@@ -38,9 +41,15 @@ class _TaskItemState extends State<TaskItem> {
           child: CustomListTile(
             name: widget.task.name,
             dateTime: widget.task.dateTime,
-            onChanged: (isCompleted) {
+            onChanged: (isCompleted) async {
               _isCompleted = isCompleted;
               setState(() {});
+              await context.read<TaskCubit>().markAsCompletedOrNot(
+                taskId: widget.task.id!,
+                isCompleted: isCompleted,
+                date: widget.task.dateTime,
+              );
+              widget.onChanged();
             },
             isCompleted: _isCompleted,
             trailing: Column(

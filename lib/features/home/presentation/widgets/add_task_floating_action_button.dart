@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theming/colors_manager.dart';
 
 class AddTaskFloatingActionButton extends StatelessWidget {
-  const AddTaskFloatingActionButton({super.key, this.onPressed});
+  const AddTaskFloatingActionButton({
+    super.key,
+    this.onPressed,
+    required this.opacity,
+  });
 
   final void Function()? onPressed;
+  final double opacity;
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: onPressed,
-      shape: const CircleBorder(),
-      elevation: 0,
-      backgroundColor: ColorsManager.color24252C,
-      child: Icon(Icons.add, color: ColorsManager.color5F33E1,size: 30.r),
+    return Opacity(
+      opacity: opacity,
+      child: FloatingActionButton(
+        onPressed: onPressed,
+        shape: const CircleBorder(),
+        elevation: 0,
+        backgroundColor: ColorsManager.color5F33E1,
+        child: const Icon(Icons.add, color: ColorsManager.white),
+      ),
     );
   }
 }

@@ -7,7 +7,12 @@ abstract class TaskRemoteDataSource {
 
   Future<void> deleteTask(String taskId);
 
-  Future<List<TaskModel>> getAllTasks();
+  Future<List<TaskModel>> getTasks(DateTime date);
 
   Future<List<TaskModel>> search(String name);
+
+  Future<void> markAsCompletedOrNot({
+    required String taskId,
+    required bool isCompleted,
+  });
 }

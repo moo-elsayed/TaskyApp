@@ -35,16 +35,16 @@ class TaskRepositoryImplementation implements TaskRepository {
     try {
       await _remoteDataSource.editTask(task);
     } on FirebaseException catch (e) {
-      throw ('Failed to delete task: ${e.message}');
+      throw ('Failed to edit task: ${e.message}');
     } catch (e) {
       throw ('An unexpected error occurred: ${e.toString()}');
     }
   }
 
   @override
-  Future<List<TaskModel>> getAllTasks() async {
+  Future<List<TaskModel>> getTasks(DateTime date) async {
     try {
-      return await _remoteDataSource.getAllTasks();
+      return await _remoteDataSource.getTasks(date);
     } on FirebaseException catch (e) {
       throw ('Failed to get tasks: ${e.message}');
     } catch (e) {
@@ -58,6 +58,23 @@ class TaskRepositoryImplementation implements TaskRepository {
       return await _remoteDataSource.search(name);
     } on FirebaseException catch (e) {
       throw ('Failed to get tasks: ${e.message}');
+    } catch (e) {
+      throw ('An unexpected error occurred: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> markAsCompletedOrNot({
+    required String taskId,
+    required bool isCompleted,
+  }) async {
+    try {
+      await _remoteDataSource.markAsCompletedOrNot(
+        taskId: taskId,
+        isCompleted: isCompleted,
+      );
+    } on FirebaseException catch (e) {
+      throw ('Failed to complete task: ${e.message}');
     } catch (e) {
       throw ('An unexpected error occurred: ${e.toString()}');
     }

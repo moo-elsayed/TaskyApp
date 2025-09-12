@@ -17,7 +17,6 @@ import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
 import '../../../../core/utils/functions.dart';
 import '../managers/cubits/task_cubit/task_cubit.dart';
 import 'custom_data_container.dart';
-import 'custom_error_dialog.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
   const AddTaskBottomSheet({super.key});
@@ -51,7 +50,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
             message: 'Task added successfully',
             contentType: ContentType.success,
           );
-          context.read<TaskCubit>().getAllTasks();
+          context.read<TaskCubit>().getTasks(_currentDate!);
           context.pop();
         }
         if (state is AddTaskFailure) {
@@ -61,7 +60,10 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       builder: (context, state) => Stack(
         children: [
           GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
+            onTap: () => FocusManager
+                .instance
+                .primaryFocus!
+                .unfocus(),
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: EdgeInsets.only(
@@ -272,13 +274,5 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     return 'Please select a $message.';
   }
 
-  void showErrorDialog({
-    required BuildContext context,
-    required String errorMessage,
-  }) => showCupertinoDialog(
-    context: context,
-    barrierDismissible: true,
-    builder: (context) =>
-        CustomErrorDialog(title: 'Error', description: errorMessage),
-  );
+
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasky_app/features/home/domain/repos/task_repo.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_states.dart';
@@ -28,13 +30,13 @@ class TaskCubit extends Cubit<TaskStates> {
     }
   }
 
-  Future getAllTasks() async {
-    emit(GetAllTasksLoading());
+  Future getTasks(DateTime date) async {
+    emit(GetTasksLoading());
     try {
-      final tasks = await _taskRepository.getAllTasks();
-      emit(GetAllTasksSuccess(tasks));
+      final tasks = await _taskRepository.getTasks(date);
+      emit(GetTasksSuccess(tasks));
     } catch (e) {
-      emit(GetAllTasksFailure(e.toString()));
+      emit(GetTasksFailure(e.toString()));
     }
   }
 
@@ -47,4 +49,31 @@ class TaskCubit extends Cubit<TaskStates> {
       emit(SearchTaskFailure(e.toString()));
     }
   }
+
+  Future markAsCompletedOrNot({
+    required String taskId,
+    required bool isCompleted,
+    required DateTime date,
+  }) async {
+    try {
+      await _taskRepository.markAsCompletedOrNot(
+        taskId: taskId,
+        isCompleted: isCompleted,
+      );
+       // getTasks(date);
+      // emit(MarkAsCompletedOrNotSuccess());
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  // Future getDaysOfTasks() async {
+  //   emit(GetDaysOfTasksLoading());
+  //   try {
+  //     final days = await _taskRepository.getDaysOfTasks();
+  //     emit(GetDaysOfTasksSuccess(days));
+  //   } catch (e) {
+  //     emit(GetDaysOfTasksFailure(e.toString()));
+  //   }
+  // }
 }

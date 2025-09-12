@@ -11,6 +11,7 @@ class LoadingTasksListView extends StatelessWidget {
     return ListView.separated(
       // padding: EdgeInsets.symmetric(vertical: 18.h, horizontal: 12.w),
       // padding: EdgeInsets.symmetric(horizontal: 12.w),
+      padding: EdgeInsets.symmetric(vertical: 26.h),
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: 3,

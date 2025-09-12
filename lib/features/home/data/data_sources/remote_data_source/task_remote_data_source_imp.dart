@@ -24,8 +24,34 @@ class TaskRemoteDataSourceImplementation implements TaskRemoteDataSource {
   }
 
   @override
-  Future<List<TaskModel>> getAllTasks() async {
-    final snapshot = await _tasksCollection().orderBy('priority').get();
+  Future<List<TaskModel>> getTasks(DateTime date) async {
+    final DateTime startOfDay = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      0,
+      0,
+      0,
+    );
+    final DateTime endOfDay = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      23,
+      59,
+      59,
+      999999,
+    ); // Microseconds
+
+    final int startOfDayMicroseconds = startOfDay.microsecondsSinceEpoch;
+    final int endOfDayMicroseconds = endOfDay.microsecondsSinceEpoch;
+
+    final snapshot = await _tasksCollection()
+        .where('dateTime', isGreaterThanOrEqualTo: startOfDayMicroseconds)
+        .where('dateTime', isLessThanOrEqualTo: endOfDayMicroseconds)
+        .orderBy('priority')
+        .get();
+
     if (snapshot.docs.isEmpty) {
       return [];
     }
@@ -48,4 +74,11 @@ class TaskRemoteDataSourceImplementation implements TaskRemoteDataSource {
         .get()
         .then((value) => value.docs.map((e) => e.data()).toList());
   }
+
+  @override
+  Future<void> markAsCompletedOrNot({
+    required String taskId,
+    required bool isCompleted,
+  }) async =>
+      await _tasksCollection().doc(taskId).update({'isCompleted': isCompleted});
 }

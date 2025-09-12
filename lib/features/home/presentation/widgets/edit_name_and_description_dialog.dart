@@ -38,9 +38,10 @@ class _EditNameAndDescriptionDialogState
     return Dialog(
       elevation: 0,
       child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
+        onTap: () => FocusManager
+            .instance
+            .primaryFocus!
+            .unfocus(),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),

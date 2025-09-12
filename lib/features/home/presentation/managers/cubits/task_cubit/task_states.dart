@@ -24,18 +24,18 @@ class EditTaskFailure extends TaskStates {
   EditTaskFailure(this.errorMessage);
 }
 
-class GetAllTasksLoading extends TaskStates {}
+class GetTasksLoading extends TaskStates {}
 
-class GetAllTasksSuccess extends TaskStates {
+class GetTasksSuccess extends TaskStates {
   final List<TaskModel> tasks;
 
-  GetAllTasksSuccess(this.tasks);
+  GetTasksSuccess(this.tasks);
 }
 
-class GetAllTasksFailure extends TaskStates {
+class GetTasksFailure extends TaskStates {
   final String errorMessage;
 
-  GetAllTasksFailure(this.errorMessage);
+  GetTasksFailure(this.errorMessage);
 }
 
 class SearchTaskLoading extends TaskStates {}
@@ -51,3 +51,17 @@ class SearchTaskFailure extends TaskStates {
 
   SearchTaskFailure(this.errorMessage);
 }
+
+// class GetDaysOfTasksLoading extends TaskStates {}
+//
+// class GetDaysOfTasksSuccess extends TaskStates {
+//   final List<DateTime> days;
+//   GetDaysOfTasksSuccess(this.days);
+// }
+//
+// class GetDaysOfTasksFailure extends TaskStates {
+//   final String errorMessage;
+//   GetDaysOfTasksFailure(this.errorMessage);
+// }
+
+class MarkAsCompletedOrNotSuccess extends TaskStates {}

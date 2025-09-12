@@ -63,15 +63,13 @@ class _EditTaskViewState extends State<EditTaskView> {
             message: 'Task Deleted',
             contentType: ContentType.success,
           );
-          context.read<TaskCubit>().getAllTasks();
+          context.read<TaskCubit>().getTasks(_taskDate);
           context.pop();
         }
         if (state is DeleteTaskFailure) {
-          showCustomToast(
-            context: context,
-            message: state.errorMessage,
-            contentType: ContentType.failure,
-          );
+          showErrorDialog(context: context, errorMessage: state.errorMessage);
+        } else if (state is EditTaskFailure) {
+          showErrorDialog(context: context, errorMessage: state.errorMessage);
         }
       },
       builder: (context, state) => ModalProgressHUD(
@@ -212,10 +210,10 @@ class _EditTaskViewState extends State<EditTaskView> {
                     message: 'Task Edited',
                     contentType: ContentType.success,
                   );
-                  context.read<TaskCubit>().getAllTasks();
+                  context.read<TaskCubit>().getTasks(_taskDate);
                   context.pop();
                 }
-                if (state is GetAllTasksFailure) {
+                if (state is GetTasksFailure) {
                   showCustomToast(
                     context: context,
                     message: state.errorMessage,
