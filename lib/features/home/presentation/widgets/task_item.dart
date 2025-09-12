@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/routing/routes.dart';
+import 'package:tasky_app/features/home/data/models/edit_task_args.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_cubit.dart';
 import 'package:tasky_app/features/home/presentation/widgets/custom_data_container.dart';
 import 'package:tasky_app/features/home/presentation/widgets/custom_list_tile.dart';
@@ -13,10 +14,18 @@ import '../../../../core/theming/styles.dart';
 import '../../data/models/task.dart';
 
 class TaskItem extends StatefulWidget {
-  const TaskItem({super.key, required this.task, required this.onChanged});
+  const TaskItem({
+    super.key,
+    required this.task,
+    required this.onChanged,
+    this.search = false,
+    this.query,
+  });
 
   final TaskModel task;
   final Function() onChanged;
+  final bool? search;
+  final String? query;
 
   @override
   State<TaskItem> createState() => _TaskItemState();
@@ -28,8 +37,27 @@ class _TaskItemState extends State<TaskItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () =>
-          context.pushNamed(Routes.editTaskView, arguments: widget.task),
+      onTap: () {
+        if (widget.search == true) {
+          context.pushNamed(
+            Routes.editTaskView,
+            arguments: EditTaskArgs(
+              task: widget.task,
+              query: widget.query,
+              isSearched: true,
+            ),
+          );
+        } else {
+          context.pushNamed(
+            Routes.editTaskView,
+            arguments: EditTaskArgs(
+              task: widget.task,
+              currentDay: widget.task.dateTime,
+              isSearched: false,
+            ),
+          );
+        }
+      },
       child: FadeInUp(
         from: 20,
         duration: const Duration(milliseconds: 200),

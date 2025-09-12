@@ -30,10 +30,10 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List<TaskModel> uncompletedTasks = [];
-  List<TaskModel> completedTasks = [];
-  List<TaskModel> tasks = [];
-  List<TaskModel> searchList = [];
+  List<TaskModel> _uncompletedTasks = [];
+  List<TaskModel> _completedTasks = [];
+  List<TaskModel> _tasks = [];
+  List<TaskModel> _searchList = [];
   final List<DateTime> _days = List.generate(
     10,
     (index) => DateTime.now()
@@ -43,6 +43,7 @@ class _HomeViewState extends State<HomeView> {
   late DateTime _currentDay = _days[3];
   Timer? _debounce;
   final _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   void _buildOnChanged(String? text) {
     if (text != null && text.trim().isNotEmpty) {
@@ -58,17 +59,18 @@ class _HomeViewState extends State<HomeView> {
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       if (_searchController.text.trim() == taskName.trim() &&
           taskName.isNotEmpty) {
-        log(taskName);
         context.read<TaskCubit>().search(taskName);
       }
     });
   }
 
   void getTasksByCategory() {
-    uncompletedTasks = tasks
+    _uncompletedTasks = _tasks
         .where((task) => task.isCompleted == false)
         .toList();
-    completedTasks = tasks.where((task) => task.isCompleted == true).toList();
+    _completedTasks = _tasks.where((task) => task.isCompleted == true).toList();
+    log(_uncompletedTasks.length.toString());
+    log(_completedTasks.length.toString());
   }
 
   @override
@@ -81,6 +83,7 @@ class _HomeViewState extends State<HomeView> {
   void dispose() {
     _debounce?.cancel();
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -90,8 +93,9 @@ class _HomeViewState extends State<HomeView> {
       resizeToAvoidBottomInset: false,
       body: BlocConsumer<TaskCubit, TaskStates>(
         listener: (context, state) {
+          _scrollController.jumpTo(0);
           if (state is GetTasksSuccess) {
-            tasks = state.tasks;
+            _tasks = state.tasks;
             getTasksByCategory();
           } else if (state is GetTasksFailure) {
             showCustomToast(
@@ -100,199 +104,116 @@ class _HomeViewState extends State<HomeView> {
               contentType: ContentType.failure,
             );
           } else if (state is SearchTaskSuccess) {
-            searchList = state.tasks;
+            _searchList = state.tasks;
           }
         },
         builder: (context, state) {
-          if (state is GetTasksSuccess) {
-            return SafeArea(
-              child: GestureDetector(
-                onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: buildPadding(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const HomeAppBar(),
-                      Gap(16.h),
-                      TextFormFieldHelper(
-                        controller: _searchController,
-                        hint: 'Search for your task...',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/icons/search-icon.svg',
-                          height: 24.h,
-                          width: 24.w,
-                          fit: BoxFit.scaleDown,
-                        ),
-                        contentPadding: EdgeInsets.all(12.r),
-                        borderRadius: BorderRadius.circular(10.r),
-                        borderColor: ColorsManager.color6E6A7C,
-                        action: TextInputAction.search,
-                        onChanged: _buildOnChanged,
-                        suffixWidget: _searchController.text.isNotEmpty
-                            ? GestureDetector(
-                                onTap: () {
-                                  _searchController.clear();
-                                  context.read<TaskCubit>().getTasks(
-                                    _currentDay,
-                                  );
-                                  setState(() {});
-                                },
-                                child: Icon(
-                                  Icons.clear,
-                                  color: ColorsManager.color6E6A7C,
-                                  size: 22.r,
-                                ),
-                              )
-                            : null,
-                      ),
-                      Gap(16.h),
-                      CustomDropdownList(
-                        days: _days,
-                        currentDay: _currentDay,
-                        onChanged: (value) {
-                          _currentDay = value!;
-                          setState(() {});
-                        },
-                      ),
-                      completedTasks.length + uncompletedTasks.length == 0
-                          ? const NoTasksBody()
-                          : Expanded(
-                              child: TasksListView(
-                                completedTasks: completedTasks,
-                                uncompletedTasks: uncompletedTasks,
+          return SafeArea(
+            child: GestureDetector(
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: buildPadding(),
+                child: NestedScrollView(
+                  controller: _scrollController,
+                  physics:
+                      (state is SearchTaskSuccess && _searchList.length >= 6) ||
+                          (state is GetTasksSuccess && _tasks.length >= 6)
+                      ? const BouncingScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
+                  headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                    SliverAppBar(
+                      pinned: true,
+                      floating: true,
+                      snap: true,
+                      automaticallyImplyLeading: false,
+                      expandedHeight: state is GetTasksSuccess ? 170.h : 100.h,
+                      toolbarHeight: 0,
+                      backgroundColor: ColorsManager.white,
+                      surfaceTintColor: ColorsManager.white,
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const HomeAppBar(),
+                            Gap(16.h),
+                            TextFormFieldHelper(
+                              controller: _searchController,
+                              hint: 'Search for your task...',
+                              prefixIcon: SvgPicture.asset(
+                                'assets/icons/search-icon.svg',
+                                height: 24.h,
+                                width: 24.w,
+                                fit: BoxFit.scaleDown,
                               ),
+                              contentPadding: EdgeInsets.all(12.r),
+                              borderRadius: BorderRadius.circular(10.r),
+                              borderColor: ColorsManager.color6E6A7C,
+                              action: TextInputAction.search,
+                              onChanged: _buildOnChanged,
+                              suffixWidget: _searchController.text.isNotEmpty
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        context.read<TaskCubit>().getTasks(
+                                          _currentDay,
+                                        );
+                                        _searchController.clear();
+                                        setState(() {});
+                                      },
+                                      child: Icon(
+                                        Icons.clear,
+                                        color: ColorsManager.color6E6A7C,
+                                        size: 22.r,
+                                      ),
+                                    )
+                                  : null,
                             ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          } else if (state is SearchTaskSuccess) {
-            return SafeArea(
-              child: GestureDetector(
-                onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: buildPadding(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const HomeAppBar(),
-                      Gap(16.h),
-                      TextFormFieldHelper(
-                        controller: _searchController,
-                        hint: 'Search for your task...',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/icons/search-icon.svg',
-                          height: 24.h,
-                          width: 24.w,
-                          fit: BoxFit.scaleDown,
+                          ],
                         ),
-                        contentPadding: EdgeInsets.all(12.r),
-                        borderRadius: BorderRadius.circular(10.r),
-                        borderColor: ColorsManager.color6E6A7C,
-                        action: TextInputAction.search,
-                        onChanged: _buildOnChanged,
-                        suffixWidget: _searchController.text.isNotEmpty
-                            ? GestureDetector(
-                                onTap: () {
-                                  context.read<TaskCubit>().getTasks(
-                                    _currentDay,
-                                  );
-                                  _searchController.clear();
+                      ),
+                      bottom: state is GetTasksSuccess
+                          ? PreferredSize(
+                              preferredSize: const Size.fromHeight(
+                                kToolbarHeight,
+                              ),
+                              child: CustomDropdownList(
+                                days: _days,
+                                currentDay: _currentDay,
+                                onChanged: (value) {
+                                  _currentDay = value!;
                                   setState(() {});
                                 },
-                                child: Icon(
-                                  Icons.clear,
-                                  color: ColorsManager.color6E6A7C,
-                                  size: 22.r,
-                                ),
+                              ),
+                            )
+                          : null,
+                    ),
+                  ],
+                  body: (state is GetTasksLoading || state is SearchTaskLoading)
+                      ? const LoadingTasksListView()
+                      : (state is GetTasksSuccess)
+                      ? (_tasks.isEmpty)
+                            ? const NoTasksBody()
+                            : TasksListView(
+                                completedTasks: _completedTasks,
+                                uncompletedTasks: _uncompletedTasks,
                               )
-                            : null,
-                      ),
-                      Gap(16.h),
-                      searchList.isEmpty
-                          ? const NoTasksBody()
-                          : Expanded(
-                              child: TasksListView(searchResults: searchList),
-                            ),
-                    ],
-                  ),
+                      : (state is SearchTaskSuccess)
+                      ? (_searchList.isEmpty)
+                            ? const NoTasksBody()
+                            : TasksListView(
+                                searchResults: _searchList,
+                                query: _searchController.text,
+                              )
+                      : const SizedBox.shrink(),
                 ),
               ),
-            );
-          } else if (state is GetTasksLoading || state is SearchTaskLoading) {
-            return SafeArea(
-              child: GestureDetector(
-                onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: buildPadding(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const HomeAppBar(),
-                      Gap(16.h),
-                      TextFormFieldHelper(
-                        controller: _searchController,
-                        hint: 'Search for your task...',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/icons/search-icon.svg',
-                          height: 24.h,
-                          width: 24.w,
-                          fit: BoxFit.scaleDown,
-                        ),
-                        contentPadding: EdgeInsets.all(12.r),
-                        borderRadius: BorderRadius.circular(10.r),
-                        borderColor: ColorsManager.color6E6A7C,
-                        action: TextInputAction.search,
-                        onChanged: _buildOnChanged,
-                        suffixWidget: _searchController.text.isNotEmpty
-                            ? GestureDetector(
-                                onTap: () {
-                                  context.read<TaskCubit>().getTasks(
-                                    _currentDay,
-                                  );
-                                  _searchController.clear();
-                                  setState(() {});
-                                },
-                                child: Icon(
-                                  Icons.clear,
-                                  color: ColorsManager.color6E6A7C,
-                                  size: 22.r,
-                                ),
-                              )
-                            : null,
-                      ),
-                      Gap(16.h),
-                      if (state is GetTasksLoading)
-                        CustomDropdownList(
-                          days: _days,
-                          currentDay: _currentDay,
-                          onChanged: (value) {
-                            _currentDay = value!;
-                            setState(() {});
-                          },
-                        ),
-                      const LoadingTasksListView(),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
+            ),
+          );
         },
       ),
       floatingActionButton: MediaQuery.of(context).viewInsets.bottom == 0
           ? AddTaskFloatingActionButton(
-              // opacity: tasks.length >= 7 ? 0.7 : 1,
-              opacity: 1,
               onPressed: () {
-                TextEditingController().clear();
                 showModalBottomSheet(
                   backgroundColor: ColorsManager.white,
                   isScrollControlled: true,
@@ -300,7 +221,7 @@ class _HomeViewState extends State<HomeView> {
                   builder: (context) => BlocProvider(
                     create: (context) =>
                         AddTaskCubit(getIt.get<TaskRepositoryImplementation>()),
-                    child: const AddTaskBottomSheet(),
+                    child: AddTaskBottomSheet(currentDay: _currentDay),
                   ),
                 );
               },

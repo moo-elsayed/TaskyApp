@@ -7,7 +7,7 @@ import 'package:tasky_app/core/utils/functions.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_cubit.dart';
 import '../../../../core/theming/colors_manager.dart';
 
-class CustomDropdownList extends StatefulWidget {
+class CustomDropdownList extends StatefulWidget{
   const CustomDropdownList({
     super.key,
     required this.days,
@@ -21,6 +21,7 @@ class CustomDropdownList extends StatefulWidget {
 
   @override
   State<CustomDropdownList> createState() => _CustomDropdownListState();
+
 }
 
 class _CustomDropdownListState extends State<CustomDropdownList> {
@@ -34,36 +35,39 @@ class _CustomDropdownListState extends State<CustomDropdownList> {
         splashColor: Colors.transparent,
         hoverColor: Colors.transparent,
       ),
-      child: Container(
-        width: 100.w,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.r),
-          color: ColorsManager.white,
-          border: Border.all(color: ColorsManager.color6E6A7C),
-        ),
-        child: DropdownButton<DateTime>(
-          style: TextStylesManager.font12color404147Regular,
-          padding: EdgeInsetsGeometry.symmetric(horizontal: 12.w),
-          icon: SvgPicture.asset('assets/icons/drop_down.svg'),
-          isExpanded: true,
-          value: _selectedValue,
-          menuWidth: 100.w,
-          dropdownColor: ColorsManager.white,
-          underline: const SizedBox.shrink(),
-          borderRadius: BorderRadius.circular(10),
-          items: widget.days.map((DateTime option) {
-            return DropdownMenuItem<DateTime>(
-              value: option,
-              child: Text(getDropdownText(option)),
-            );
-          }).toList(),
-          onChanged: (DateTime? value) {
-            if (value != null && _selectedValue != value) {
-              context.read<TaskCubit>().getTasks(value);
-              _selectedValue = value;
-              widget.onChanged(value);
-            }
-          },
+      child: Align(
+        alignment: AlignmentGeometry.centerLeft,
+        child: Container(
+          width: 100.w,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.r),
+            color: ColorsManager.white,
+            border: Border.all(color: ColorsManager.color6E6A7C),
+          ),
+          child: DropdownButton<DateTime>(
+            style: TextStylesManager.font12color404147Regular,
+            padding: EdgeInsetsGeometry.symmetric(horizontal: 12.w),
+            icon: SvgPicture.asset('assets/icons/drop_down.svg'),
+            isExpanded: true,
+            value: _selectedValue,
+            menuWidth: 100.w,
+            dropdownColor: ColorsManager.white,
+            underline: const SizedBox.shrink(),
+            borderRadius: BorderRadius.circular(10),
+            items: widget.days.map((DateTime option) {
+              return DropdownMenuItem<DateTime>(
+                value: option,
+                child: Text(getDay(option)),
+              );
+            }).toList(),
+            onChanged: (DateTime? value) {
+              if (value != null && _selectedValue != value) {
+                context.read<TaskCubit>().getTasks(value);
+                _selectedValue = value;
+                widget.onChanged(value);
+              }
+            },
+          ),
         ),
       ),
     );

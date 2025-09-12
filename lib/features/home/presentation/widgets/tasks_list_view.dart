@@ -8,55 +8,55 @@ import '../../../../core/theming/styles.dart';
 import '../../data/models/task.dart';
 import '../managers/cubits/task_cubit/task_cubit.dart';
 
-class TasksListView extends StatefulWidget {
+class TasksListView extends StatelessWidget {
   const TasksListView({
     super.key,
     this.searchResults,
     this.completedTasks,
     this.uncompletedTasks,
+    this.query,
   });
 
   final List<TaskModel>? searchResults;
   final List<TaskModel>? completedTasks;
   final List<TaskModel>? uncompletedTasks;
+  final String? query;
 
-  @override
-  State<TasksListView> createState() => _TasksListViewState();
-}
-
-class _TasksListViewState extends State<TasksListView> {
   @override
   Widget build(BuildContext context) {
-    return widget.searchResults != null
+    return searchResults != null
         ? ListView.separated(
-            padding: EdgeInsets.symmetric(vertical: 26.h),
-            physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
+            padding: EdgeInsets.only(top: 26.h, bottom: 0.h),
+            physics: searchResults!.length < 6
+                ? const NeverScrollableScrollPhysics()
+                : const BouncingScrollPhysics(),
             itemBuilder: (context, index) {
-              var task = widget.searchResults![index];
+              var task = searchResults![index];
               return TaskItem(
                 task: task,
-                onChanged: () =>
-                    context.read<TaskCubit>().search(task.name),
+                search: true,
+                query: query,
+                onChanged: () => context.read<TaskCubit>().search(query!),
               );
             },
             separatorBuilder: (context, index) => Gap(16.h),
-            itemCount: widget.searchResults!.length,
+            itemCount: searchResults!.length,
           )
         : ListView.separated(
-            padding: EdgeInsets.symmetric(vertical: 26.h),
-            physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
+            padding: EdgeInsets.only(top: 26.h, bottom: 0.h),
+            physics: completedTasks!.length + uncompletedTasks!.length < 6
+                ? const NeverScrollableScrollPhysics()
+                : const BouncingScrollPhysics(),
             itemBuilder: (context, index) {
-              if (index < widget.uncompletedTasks!.length) {
-                var task = widget.uncompletedTasks![index];
+              if (index < uncompletedTasks!.length) {
+                var task = uncompletedTasks![index];
                 return TaskItem(
                   task: task,
                   onChanged: () =>
                       context.read<TaskCubit>().getTasks(task.dateTime),
                 );
-              } else if (index == widget.uncompletedTasks!.length &&
-                  widget.completedTasks!.isNotEmpty) {
+              } else if (index == uncompletedTasks!.length &&
+                  completedTasks!.isNotEmpty) {
                 return Align(
                   alignment: AlignmentGeometry.centerLeft,
                   child: Container(
@@ -75,10 +75,9 @@ class _TasksListViewState extends State<TasksListView> {
                     ),
                   ),
                 );
-              } else if (widget.completedTasks!.isNotEmpty) {
-                int uncompletedTasksLength = widget.uncompletedTasks!.length;
-                var task =
-                    widget.completedTasks![index - uncompletedTasksLength - 1];
+              } else if (completedTasks!.isNotEmpty) {
+                int uncompletedTasksLength = uncompletedTasks!.length;
+                var task = completedTasks![index - uncompletedTasksLength - 1];
                 return TaskItem(
                   task: task,
                   onChanged: () =>
@@ -88,10 +87,7 @@ class _TasksListViewState extends State<TasksListView> {
               return null;
             },
             separatorBuilder: (context, index) => Gap(16.h),
-            itemCount:
-                widget.completedTasks!.length +
-                widget.uncompletedTasks!.length +
-                1,
+            itemCount: completedTasks!.length + uncompletedTasks!.length + 1,
           );
   }
 }

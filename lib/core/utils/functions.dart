@@ -8,7 +8,7 @@ String getTime(TimeOfDay time) =>
     '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
 String getDateTime(DateTime date) =>
-    '${getDate(date)} At ${getTime(TimeOfDay(hour: date.hour, minute: date.minute))}';
+    '${getDay(date)} At ${getTime(TimeOfDay(hour: date.hour, minute: date.minute))}';
 
 void showErrorDialog({
   required BuildContext context,
@@ -20,7 +20,7 @@ void showErrorDialog({
       CustomErrorDialog(title: 'Error', description: errorMessage),
 );
 
-String getDropdownText(DateTime date) {
+String getDay(DateTime date) {
   if (date.day == DateTime.now().subtract(const Duration(days: 1)).day) {
     return 'Yesterday';
   } else if (date.day == DateTime.now().day) {

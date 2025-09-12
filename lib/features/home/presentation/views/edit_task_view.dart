@@ -8,6 +8,7 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/theming/colors_manager.dart';
 import 'package:tasky_app/core/widgets/custom_material_button.dart';
+import 'package:tasky_app/features/home/data/models/edit_task_args.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_cubit.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_states.dart';
 import 'package:tasky_app/features/home/presentation/widgets/custom_list_tile.dart';
@@ -21,35 +22,36 @@ import '../widgets/edit_name_and_description_dialog.dart';
 import '../widgets/task_priority_dialog.dart';
 
 class EditTaskView extends StatefulWidget {
-  const EditTaskView({super.key, required this.task});
+  const EditTaskView({super.key, required this.editTaskArgs});
 
-  final TaskModel task;
+  final EditTaskArgs editTaskArgs;
 
   @override
   State<EditTaskView> createState() => _EditTaskViewState();
 }
 
 class _EditTaskViewState extends State<EditTaskView> {
-  late bool _isCompleted = widget.task.isCompleted ?? false;
-  late DateTime _taskDate = widget.task.dateTime;
+  late TaskModel task = widget.editTaskArgs.task;
+  late bool _isCompleted = task.isCompleted ?? false;
+  late DateTime _taskDate = task.dateTime;
   late TimeOfDay _taskTime = TimeOfDay(
-    hour: widget.task.dateTime.hour,
-    minute: widget.task.dateTime.minute,
+    hour: task.dateTime.hour,
+    minute: task.dateTime.minute,
   );
-  late int _priority = widget.task.priority;
-  late String _name = widget.task.name;
-  late String _description = widget.task.description ?? '';
+  late int _priority = task.priority;
+  late String _name = task.name;
+  late String _description = task.description ?? '';
 
   void _resetChanges() {
-    _isCompleted = widget.task.isCompleted ?? false;
-    _taskDate = widget.task.dateTime;
+    _isCompleted = task.isCompleted ?? false;
+    _taskDate = task.dateTime;
     _taskTime = TimeOfDay(
-      hour: widget.task.dateTime.hour,
-      minute: widget.task.dateTime.minute,
+      hour: task.dateTime.hour,
+      minute: task.dateTime.minute,
     );
-    _priority = widget.task.priority;
-    _name = widget.task.name;
-    _description = widget.task.description ?? '';
+    _priority = task.priority;
+    _name = task.name;
+    _description = task.description ?? '';
     setState(() {});
   }
 
@@ -63,13 +65,20 @@ class _EditTaskViewState extends State<EditTaskView> {
             message: 'Task Deleted',
             contentType: ContentType.success,
           );
-          context.read<TaskCubit>().getTasks(_taskDate);
+          if (widget.editTaskArgs.isSearched) {
+            context.read<TaskCubit>().search(widget.editTaskArgs.query!);
+          } else {
+            context.read<TaskCubit>().getTasks(widget.editTaskArgs.currentDay!);
+          }
           context.pop();
         }
-        if (state is DeleteTaskFailure) {
-          showErrorDialog(context: context, errorMessage: state.errorMessage);
-        } else if (state is EditTaskFailure) {
-          showErrorDialog(context: context, errorMessage: state.errorMessage);
+        if (state is DeleteTaskFailure || state is EditTaskFailure) {
+          showErrorDialog(
+            context: context,
+            errorMessage: state is DeleteTaskFailure
+                ? state.errorMessage
+                : (state as EditTaskFailure).errorMessage,
+          );
         }
       },
       builder: (context, state) => ModalProgressHUD(
@@ -210,14 +219,22 @@ class _EditTaskViewState extends State<EditTaskView> {
                     message: 'Task Edited',
                     contentType: ContentType.success,
                   );
-                  context.read<TaskCubit>().getTasks(_taskDate);
+                  // context.read<TaskCubit>().getTasks(_taskDate);
+                  if (widget.editTaskArgs.isSearched) {
+                    context.read<TaskCubit>().search(
+                      widget.editTaskArgs.query!,
+                    );
+                  } else {
+                    context.read<TaskCubit>().getTasks(
+                      widget.editTaskArgs.currentDay!,
+                    );
+                  }
                   context.pop();
                 }
-                if (state is GetTasksFailure) {
-                  showCustomToast(
+                if (state is EditTaskFailure) {
+                  showErrorDialog(
                     context: context,
-                    message: state.errorMessage,
-                    contentType: ContentType.failure,
+                    errorMessage: state.errorMessage,
                   );
                 }
               },
@@ -248,7 +265,7 @@ class _EditTaskViewState extends State<EditTaskView> {
                           description: _description,
                           isCompleted: _isCompleted,
                           priority: _priority,
-                          id: widget.task.id,
+                          id: task.id,
                         ),
                       );
                     },
@@ -270,7 +287,7 @@ class _EditTaskViewState extends State<EditTaskView> {
           delete: true,
           fullText: 'Are you sure you want to delete task?',
           onTap: () {
-            context.read<TaskCubit>().deleteTask(widget.task.id!);
+            context.read<TaskCubit>().deleteTask(task.id!);
             context.pop();
           },
           textOkButton: 'Delete',

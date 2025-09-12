@@ -19,7 +19,9 @@ import '../managers/cubits/task_cubit/task_cubit.dart';
 import 'custom_data_container.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
-  const AddTaskBottomSheet({super.key});
+  const AddTaskBottomSheet({super.key, required this.currentDay});
+
+  final DateTime currentDay;
 
   @override
   State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
@@ -50,7 +52,9 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
             message: 'Task added successfully',
             contentType: ContentType.success,
           );
-          context.read<TaskCubit>().getTasks(_currentDate!);
+          if (_currentDate!.day == widget.currentDay.day) {
+            context.read<TaskCubit>().getTasks(widget.currentDay);
+          }
           context.pop();
         }
         if (state is AddTaskFailure) {
@@ -60,10 +64,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       builder: (context, state) => Stack(
         children: [
           GestureDetector(
-            onTap: () => FocusManager
-                .instance
-                .primaryFocus!
-                .unfocus(),
+            onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: EdgeInsets.only(
@@ -273,6 +274,4 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
     return 'Please select a $message.';
   }
-
-
 }
