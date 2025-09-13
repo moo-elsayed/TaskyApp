@@ -1,17 +1,18 @@
+import 'package:tasky_app/core/helpers/network_reponse.dart';
 import 'package:tasky_app/features/home/data/models/task.dart';
 
 abstract class TaskRepository {
-  Future<void> addTask(TaskModel task);
+  Future<NetworkResponse> addTask(TaskModel task);
 
-  Future<void> editTask(TaskModel task);
+  Future<NetworkResponse> editTask(TaskModel task);
 
-  Future<void> deleteTask(String taskId);
+  Future<NetworkResponse> deleteTask(String taskId);
 
-  Future<List<TaskModel>> getTasks(DateTime date);
+  Future<NetworkResponse> getTasks(DateTime date);
 
-  Future<List<TaskModel>> search(String name);
+  Future<NetworkResponse> search(String name);
 
-  Future<void> markAsCompletedOrNot({
+  Future<NetworkResponse> markAsCompletedOrNot({
     required String taskId,
     required bool isCompleted,
   });
