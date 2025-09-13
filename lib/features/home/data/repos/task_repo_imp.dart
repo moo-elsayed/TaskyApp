@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tasky_app/features/home/data/models/task.dart';
 import 'package:tasky_app/features/home/domain/repos/task_repo.dart';
+import '../../../../core/helpers/network_reponse.dart';
 import '../data_sources/remote_data_source/task_remote_data_source.dart';
 
 class TaskRepositoryImplementation implements TaskRepository {
@@ -9,62 +10,77 @@ class TaskRepositoryImplementation implements TaskRepository {
   TaskRepositoryImplementation(this._remoteDataSource);
 
   @override
-  Future<void> addTask(TaskModel task) async {
+  Future<NetworkResponse> addTask(TaskModel task) async {
     try {
       await _remoteDataSource.addTask(task);
+      return NetworkSuccess();
     } on FirebaseException catch (e) {
-      throw ('Failed to add task: ${e.message}');
+      return NetworkFailure(Exception('Failed to add task: ${e.message}'));
     } catch (e) {
-      throw ('An unexpected error occurred: ${e.toString()}');
+      return NetworkFailure(
+        Exception('An unexpected error occurred: ${e.toString()}'),
+      );
     }
   }
 
   @override
-  Future<void> deleteTask(String taskId) async {
+  Future<NetworkResponse> deleteTask(String taskId) async {
     try {
       await _remoteDataSource.deleteTask(taskId);
+      return NetworkSuccess();
     } on FirebaseException catch (e) {
-      throw ('Failed to delete task: ${e.message}');
+      return NetworkFailure(Exception('Failed to delete task: ${e.message}'));
     } catch (e) {
-      throw ('An unexpected error occurred: ${e.toString()}');
+      return NetworkFailure(
+        Exception('An unexpected error occurred: ${e.toString()}'),
+      );
     }
   }
 
   @override
-  Future<void> editTask(TaskModel task) async {
+  Future<NetworkResponse> editTask(TaskModel task) async {
     try {
       await _remoteDataSource.editTask(task);
+      return NetworkSuccess();
     } on FirebaseException catch (e) {
-      throw ('Failed to edit task: ${e.message}');
+      return NetworkFailure(Exception('Failed to edit task: ${e.message}'));
     } catch (e) {
-      throw ('An unexpected error occurred: ${e.toString()}');
+      return NetworkFailure(
+        Exception('An unexpected error occurred: ${e.toString()}'),
+      );
     }
   }
 
   @override
-  Future<List<TaskModel>> getTasks(DateTime date) async {
+  Future<NetworkResponse> getTasks(DateTime date) async {
     try {
-      return await _remoteDataSource.getTasks(date);
+      List<TaskModel> result = await _remoteDataSource.getTasks(date);
+      return NetworkSuccess(data: result);
     } on FirebaseException catch (e) {
-      throw ('Failed to get tasks: ${e.message}');
+      return NetworkFailure(Exception('Failed to get tasks: ${e.message}'));
     } catch (e) {
-      throw ('An unexpected error occurred: ${e.toString()}');
+      return NetworkFailure(
+        Exception('An unexpected error occurred: ${e.toString()}'),
+      );
     }
   }
 
   @override
-  Future<List<TaskModel>> search(String name) async {
+  Future<NetworkResponse> search(String name) async {
     try {
-      return await _remoteDataSource.search(name);
+      List<TaskModel> result = await _remoteDataSource.search(name);
+      return NetworkSuccess(data: result);
     } on FirebaseException catch (e) {
-      throw ('Failed to get tasks: ${e.message}');
+      return NetworkFailure(Exception('Failed to get tasks: ${e.message}'));
     } catch (e) {
-      throw ('An unexpected error occurred: ${e.toString()}');
+      return NetworkFailure(
+        Exception('An unexpected error occurred: ${e.toString()}'),
+      );
     }
   }
 
   @override
-  Future<void> markAsCompletedOrNot({
+  Future<NetworkResponse> markAsCompletedOrNot({
     required String taskId,
     required bool isCompleted,
   }) async {
@@ -73,10 +89,13 @@ class TaskRepositoryImplementation implements TaskRepository {
         taskId: taskId,
         isCompleted: isCompleted,
       );
+      return NetworkSuccess();
     } on FirebaseException catch (e) {
-      throw ('Failed to complete task: ${e.message}');
+      return NetworkFailure(Exception('Failed to complete task: ${e.message}'));
     } catch (e) {
-      throw ('An unexpected error occurred: ${e.toString()}');
+      return NetworkFailure(
+        Exception('An unexpected error occurred: ${e.toString()}'),
+      );
     }
   }
 }
