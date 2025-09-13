@@ -8,6 +8,7 @@ import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/helpers/vaildator.dart';
 import 'package:tasky_app/core/routing/routes.dart';
 import 'package:tasky_app/core/theming/styles.dart';
+import 'package:tasky_app/core/utils/functions.dart';
 import 'package:tasky_app/core/widgets/custom_material_button.dart';
 import 'package:tasky_app/core/widgets/custom_toast.dart';
 import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
@@ -59,29 +60,22 @@ class _LoginViewState extends State<LoginView> {
             contentType: ContentType.success,
           );
           _navigateToHome(context);
-        } else if (state is SignInFailure) {
-          showCustomToast(
-            context: context,
-            message: state.errorMessage,
-            contentType: ContentType.failure,
-          );
-        } else if (state is GoogleSignInFailure) {
-          showCustomToast(
-            context: context,
-            message: state.errorMessage,
-            contentType: ContentType.failure,
-          );
         } else if (state is ForgetPasswordSuccess) {
           showCustomToast(
             context: context,
             message: 'an email has been sent to your email address',
             contentType: ContentType.success,
           );
-        } else if (state is ForgetPasswordFailure) {
-          showCustomToast(
+        } else if (state is SignInFailure ||
+            state is GoogleSignInFailure ||
+            state is ForgetPasswordFailure) {
+          showErrorDialog(
             context: context,
-            message: state.errorMessage,
-            contentType: ContentType.failure,
+            errorMessage: state is SignInFailure
+                ? state.errorMessage
+                : state is GoogleSignInFailure
+                ? state.errorMessage
+                : (state as ForgetPasswordFailure).errorMessage,
           );
         }
       },

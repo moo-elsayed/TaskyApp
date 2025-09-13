@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/helpers/vaildator.dart';
 import 'package:tasky_app/core/theming/styles.dart';
+import 'package:tasky_app/core/utils/functions.dart';
 import 'package:tasky_app/core/widgets/custom_material_button.dart';
 import 'package:tasky_app/core/widgets/custom_toast.dart';
 import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
@@ -43,10 +44,7 @@ class _LoginViewState extends State<RegisterView> {
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
-          onTap: () => FocusManager
-              .instance
-              .primaryFocus!
-              .unfocus(),
+          onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -73,10 +71,9 @@ class _LoginViewState extends State<RegisterView> {
                     contentType: ContentType.success,
                   );
                 } else if (state is SignUpFailure) {
-                  showCustomToast(
+                  showErrorDialog(
                     context: context,
-                    message: state.errorMessage,
-                    contentType: ContentType.failure,
+                    errorMessage: state.errorMessage,
                   );
                 }
               },

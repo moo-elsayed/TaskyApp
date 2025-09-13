@@ -1,10 +1,12 @@
+import 'package:tasky_app/core/helpers/network_reponse.dart';
+
 abstract class AuthRepository {
-  Future<void> signInEmailAndPassword({
+  Future<NetworkResponse> signInEmailAndPassword({
     required String email,
     required String password,
   });
 
-  Future<void> signUpEmailAndPassword({
+  Future<NetworkResponse> signUpEmailAndPassword({
     required String email,
     required String password,
     required String username,
@@ -12,7 +14,7 @@ abstract class AuthRepository {
 
   Future<void> sendEmailVerification();
 
-  Future<void> googleSignIn();
+  Future<NetworkResponse> googleSignIn();
 
-  Future<void> forgetPassword(String email);
+  Future<NetworkResponse> forgetPassword(String email);
 }

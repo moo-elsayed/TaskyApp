@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tasky_app/core/helpers/keys.dart';
+import 'package:tasky_app/core/helpers/network_reponse.dart';
 import '../../domain/repos/auth_repo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user.dart';
@@ -11,7 +12,7 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
-  Future googleSignIn() async {
+  Future<NetworkResponse> googleSignIn() async {
     try {
       final GoogleSignIn signIn = GoogleSignIn.instance;
 
@@ -25,13 +26,13 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
           .attemptLightweightAuthentication();
 
       if (googleUser == null) {
-        throw "User canceled sign in";
+        return NetworkFailure(Exception('User canceled sign in'));
       }
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
       if (googleAuth.idToken == null) {
-        throw "No idToken received from Google";
+        return NetworkFailure(Exception('No idToken received from Google'));
       }
 
       final credential = GoogleAuthProvider.credential(
@@ -48,17 +49,18 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
           id: _auth.currentUser!.uid,
         ),
       );
+      return NetworkSuccess();
     } on FirebaseAuthException catch (e) {
-      throw e.message!;
+      return NetworkFailure(Exception(e.message));
     } on PlatformException catch (e) {
-      throw e.message!;
+      return NetworkFailure(Exception(e.message));
     } catch (e) {
-      throw e.toString();
+      return NetworkFailure(Exception(e.toString()));
     }
   }
 
   @override
-  Future signInEmailAndPassword({
+  Future<NetworkResponse> signInEmailAndPassword({
     required String email,
     required String password,
   }) async {
@@ -69,7 +71,7 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
       );
       if (!credential.user!.emailVerified) {
         await sendEmailVerification();
-        throw 'please verify your email';
+        return NetworkFailure(Exception('please verify your email'));
       } else {
         await _saveUserData(
           UserModel(
@@ -79,22 +81,25 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
             id: credential.user!.uid,
           ),
         );
+        return NetworkSuccess();
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        throw 'No user found for that email.';
+        return NetworkFailure(Exception('No user found for that email.'));
       } else if (e.code == 'wrong-password') {
-        throw ('Wrong password provided for that user.');
+        return NetworkFailure(
+          Exception('Wrong password provided for that user.'),
+        );
       } else {
-        throw e.code;
+        return NetworkFailure(Exception(e.code));
       }
     } catch (e) {
-      throw e.toString();
+      return NetworkFailure(Exception(e.toString()));
     }
   }
 
   @override
-  Future<void> signUpEmailAndPassword({
+  Future<NetworkResponse> signUpEmailAndPassword({
     required String email,
     required String password,
     required String username,
@@ -115,22 +120,33 @@ class FirebaseAuthRepositoryImplementation implements AuthRepository {
           id: credential.user!.uid,
         ),
       );
+      return NetworkSuccess();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        throw 'The password provided is too weak.';
+        return NetworkFailure(Exception('The password provided is too weak.'));
       } else if (e.code == 'email-already-in-use') {
-        throw ('The account already exists for that email.');
+        return NetworkFailure(
+          Exception('The account already exists for that email.'),
+        );
       } else {
-        throw e.code;
+        return NetworkFailure(Exception(e.code));
       }
     } catch (e) {
-      throw e.toString();
+      return NetworkFailure(Exception(e.toString()));
     }
   }
 
   @override
-  Future<void> forgetPassword(String email) async =>
+  Future<NetworkResponse> forgetPassword(String email) async {
+    try {
       await _auth.sendPasswordResetEmail(email: email);
+      return NetworkSuccess();
+    } on FirebaseAuthException catch (e) {
+      return NetworkFailure(Exception(e.code));
+    } catch (e) {
+      return NetworkFailure(Exception(e.toString()));
+    }
+  }
 
   @override
   Future<void> sendEmailVerification() async =>

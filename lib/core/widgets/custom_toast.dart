@@ -17,15 +17,12 @@ void showCustomToast({
     case ContentType.success:
       bgColor = Colors.green;
       icon = Icons.check_circle;
-      break;
     case ContentType.failure:
       bgColor = Colors.red;
       icon = Icons.error;
-      break;
     case ContentType.warning:
       bgColor = Colors.orange;
       icon = Icons.warning;
-      break;
   }
 
   final fToast = FToast();

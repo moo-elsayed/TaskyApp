@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasky_app/features/auth/data/repos/firebase_auth_repo_imp.dart';
+import '../../../../../../core/helpers/network_reponse.dart';
 import 'auth_states.dart';
 
 class AuthCubit extends Cubit<AuthStates> {
@@ -14,15 +15,17 @@ class AuthCubit extends Cubit<AuthStates> {
     required String username,
   }) async {
     emit(SignUpLoading());
-    try {
-      await firebaseAuthRepositoryImplementation.signUpEmailAndPassword(
-        email: email,
-        password: password,
-        username: username,
-      );
-      emit(SignUpSuccess());
-    } catch (e) {
-      emit(SignUpFailure(errorMessage: e.toString()));
+    var result = await firebaseAuthRepositoryImplementation
+        .signUpEmailAndPassword(
+          email: email,
+          password: password,
+          username: username,
+        );
+    switch (result) {
+      case NetworkSuccess():
+        emit(SignUpSuccess());
+      case NetworkFailure():
+        emit(SignUpFailure(errorMessage: result.exception.toString()));
     }
   }
 
@@ -31,34 +34,37 @@ class AuthCubit extends Cubit<AuthStates> {
     required String password,
   }) async {
     emit(SignInLoading());
-    try {
-      await firebaseAuthRepositoryImplementation.signInEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      emit(SignInSuccess());
-    } catch (e) {
-      emit(SignInFailure(errorMessage: e.toString()));
+    var result = await firebaseAuthRepositoryImplementation
+        .signInEmailAndPassword(email: email, password: password);
+    switch (result) {
+      case NetworkSuccess():
+        emit(SignInSuccess());
+      case NetworkFailure():
+        emit(SignInFailure(errorMessage: result.exception.toString()));
     }
   }
 
   Future<void> forgetPassword(String email) async {
     emit(ForgetPasswordLoading());
-    try {
-      await firebaseAuthRepositoryImplementation.forgetPassword(email);
-      emit(ForgetPasswordSuccess());
-    } catch (e) {
-      emit(ForgetPasswordFailure(errorMessage: e.toString()));
+    var result = await firebaseAuthRepositoryImplementation.forgetPassword(
+      email,
+    );
+    switch (result) {
+      case NetworkSuccess():
+        emit(ForgetPasswordSuccess());
+      case NetworkFailure():
+        emit(ForgetPasswordFailure(errorMessage: result.exception.toString()));
     }
   }
 
   Future googleSignIn() async {
     emit(GoogleSignInLoading());
-    try {
-      await firebaseAuthRepositoryImplementation.googleSignIn();
-      emit(GoogleSignInSuccess());
-    } catch (e) {
-      emit(GoogleSignInFailure(errorMessage: e.toString()));
+    var result = await firebaseAuthRepositoryImplementation.googleSignIn();
+    switch (result) {
+      case NetworkSuccess():
+        emit(GoogleSignInSuccess());
+      case NetworkFailure():
+        emit(GoogleSignInFailure(errorMessage: result.exception.toString()));
     }
   }
 }
