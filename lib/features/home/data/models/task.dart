@@ -1,5 +1,6 @@
 class TaskModel {
   String? id;
+  int? notificationId;
   final String name;
   final String? description;
   final DateTime dateTime;
@@ -13,6 +14,7 @@ class TaskModel {
     this.description,
     required this.priority,
     this.isCompleted = false,
+    this.notificationId,
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class TaskModel {
       'dateTime': dateTime.microsecondsSinceEpoch,
       'priority': priority,
       'isCompleted': isCompleted,
+      'notificationId': ?notificationId,
     };
   }
 
@@ -34,6 +37,7 @@ class TaskModel {
       dateTime: DateTime.fromMicrosecondsSinceEpoch(map['dateTime']),
       priority: map['priority']?.toInt() ?? 1,
       isCompleted: map['isCompleted'] ?? false,
+      notificationId: map['notificationId'],
     );
   }
 }

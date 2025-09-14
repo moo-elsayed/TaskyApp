@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tasky_app/features/home/data/models/task.dart';
 import 'package:tasky_app/features/home/domain/repos/task_repo.dart';
-import '../../../../core/helpers/network_reponse.dart';
+import '../../../../core/helpers/network_response.dart';
 import '../data_sources/remote_data_source/task_remote_data_source.dart';
 
 class TaskRepositoryImplementation implements TaskRepository {
@@ -92,6 +92,20 @@ class TaskRepositoryImplementation implements TaskRepository {
       return NetworkSuccess();
     } on FirebaseException catch (e) {
       return NetworkFailure(Exception('Failed to complete task: ${e.message}'));
+    } catch (e) {
+      return NetworkFailure(
+        Exception('An unexpected error occurred: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<NetworkResponse> setNotificationId(TaskModel task) async {
+    try {
+      await _remoteDataSource.setNotificationId(task);
+      return NetworkSuccess();
+    } on FirebaseException catch (e) {
+      return NetworkFailure(Exception('Failed to set id: ${e.message}'));
     } catch (e) {
       return NetworkFailure(
         Exception('An unexpected error occurred: ${e.toString()}'),

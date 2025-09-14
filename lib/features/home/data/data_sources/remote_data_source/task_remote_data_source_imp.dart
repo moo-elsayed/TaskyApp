@@ -33,15 +33,12 @@ class TaskRemoteDataSourceImplementation implements TaskRemoteDataSource {
       0,
       0,
     );
-    final DateTime endOfDay = DateTime(
+
+    final endOfDay = DateTime(
       date.year,
       date.month,
       date.day,
-      23,
-      59,
-      59,
-      999999,
-    ); // Microseconds
+    ).add(const Duration(days: 1, microseconds: -1));
 
     final int startOfDayMicroseconds = startOfDay.microsecondsSinceEpoch;
     final int endOfDayMicroseconds = endOfDay.microsecondsSinceEpoch;
@@ -81,4 +78,10 @@ class TaskRemoteDataSourceImplementation implements TaskRemoteDataSource {
     required bool isCompleted,
   }) async =>
       await _tasksCollection().doc(taskId).update({'isCompleted': isCompleted});
+
+  @override
+  Future<void> setNotificationId(TaskModel task) async =>
+      await _tasksCollection().doc(task.id).update({
+        'notificationId': task.notificationId,
+      });
 }

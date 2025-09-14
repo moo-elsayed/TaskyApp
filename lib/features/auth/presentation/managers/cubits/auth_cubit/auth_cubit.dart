@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasky_app/features/auth/data/repos/firebase_auth_repo_imp.dart';
-import '../../../../../../core/helpers/network_reponse.dart';
+import '../../../../../../core/helpers/network_response.dart';
 import 'auth_states.dart';
 
 class AuthCubit extends Cubit<AuthStates> {

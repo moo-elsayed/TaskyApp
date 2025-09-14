@@ -15,4 +15,6 @@ abstract class TaskRemoteDataSource {
     required String taskId,
     required bool isCompleted,
   });
+
+  Future<void> setNotificationId(TaskModel task);
 }
