@@ -1,4 +1,4 @@
-import 'package:tasky_app/core/helpers/network_reponse.dart';
+import 'package:tasky_app/core/helpers/network_response.dart';
 import 'package:tasky_app/features/home/data/models/task.dart';
 
 abstract class TaskRepository {
@@ -16,4 +16,6 @@ abstract class TaskRepository {
     required String taskId,
     required bool isCompleted,
   });
+
+  Future<NetworkResponse> setNotificationId(TaskModel task);
 }

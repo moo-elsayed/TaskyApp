@@ -76,6 +76,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+    log(_currentDay.toString());
     context.read<TaskCubit>().getTasks(_currentDay);
   }
 
@@ -89,26 +90,26 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: BlocConsumer<TaskCubit, TaskStates>(
-        listener: (context, state) {
-          _scrollController.jumpTo(0);
-          if (state is GetTasksSuccess) {
-            _tasks = state.tasks;
-            getTasksByCategory();
-          } else if (state is GetTasksFailure) {
-            showCustomToast(
-              context: context,
-              message: state.errorMessage,
-              contentType: ContentType.failure,
-            );
-          } else if (state is SearchTaskSuccess) {
-            _searchList = state.tasks;
-          }
-        },
-        builder: (context, state) {
-          return SafeArea(
+    return BlocConsumer<TaskCubit, TaskStates>(
+      listener: (context, state) {
+        _scrollController.jumpTo(0);
+        if (state is GetTasksSuccess) {
+          _tasks = state.tasks;
+          getTasksByCategory();
+        } else if (state is GetTasksFailure) {
+          showCustomToast(
+            context: context,
+            message: state.errorMessage,
+            contentType: ContentType.failure,
+          );
+        } else if (state is SearchTaskSuccess) {
+          _searchList = state.tasks;
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: SafeArea(
             child: GestureDetector(
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
               behavior: HitTestBehavior.opaque,
@@ -208,25 +209,32 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
             ),
-          );
-        },
-      ),
-      floatingActionButton: MediaQuery.of(context).viewInsets.bottom == 0
-          ? AddTaskFloatingActionButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: ColorsManager.white,
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) => BlocProvider(
-                    create: (context) =>
-                        AddTaskCubit(getIt.get<TaskRepositoryImplementation>()),
-                    child: AddTaskBottomSheet(currentDay: _currentDay),
-                  ),
-                );
-              },
-            )
-          : null,
+          ),
+          floatingActionButton: MediaQuery.of(context).viewInsets.bottom == 0
+              ? AddTaskFloatingActionButton(
+                  opacity:
+                      (state is GetTasksSuccess && _tasks.length >= 6) ||
+                          (state is SearchTaskSuccess &&
+                              _searchList.length >= 6)
+                      ? 0.75
+                      : 1,
+                  onPressed: () {
+                    showModalBottomSheet(
+                      backgroundColor: ColorsManager.white,
+                      isScrollControlled: true,
+                      context: context,
+                      builder: (context) => BlocProvider(
+                        create: (context) => AddTaskCubit(
+                          getIt.get<TaskRepositoryImplementation>(),
+                        ),
+                        child: AddTaskBottomSheet(currentDay: _currentDay),
+                      ),
+                    );
+                  },
+                )
+              : null,
+        );
+      },
     );
   }
 

@@ -1,4 +1,4 @@
-import 'package:tasky_app/core/helpers/network_reponse.dart';
+import 'package:tasky_app/core/helpers/network_response.dart';
 
 abstract class AuthRepository {
   Future<NetworkResponse> signInEmailAndPassword({

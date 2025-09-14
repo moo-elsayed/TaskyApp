@@ -266,6 +266,7 @@ class _EditTaskViewState extends State<EditTaskView> {
                           isCompleted: _isCompleted,
                           priority: _priority,
                           id: task.id,
+                          notificationId: task.notificationId!
                         ),
                       );
                     },
@@ -287,7 +288,7 @@ class _EditTaskViewState extends State<EditTaskView> {
           delete: true,
           fullText: 'Are you sure you want to delete task?',
           onTap: () {
-            context.read<TaskCubit>().deleteTask(task.id!);
+            context.read<TaskCubit>().deleteTask(task);
             context.pop();
           },
           textOkButton: 'Delete',

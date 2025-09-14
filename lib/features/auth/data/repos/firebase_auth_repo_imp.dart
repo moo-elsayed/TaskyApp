@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tasky_app/core/helpers/keys.dart';
-import 'package:tasky_app/core/helpers/network_reponse.dart';
+import 'package:tasky_app/core/helpers/network_response.dart';
 import '../../domain/repos/auth_repo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user.dart';
