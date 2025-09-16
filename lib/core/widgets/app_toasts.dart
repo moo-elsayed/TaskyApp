@@ -23,7 +23,7 @@ abstract class AppToast {
             )
           : null,
       primaryColor: Colors.white,
-      autoCloseDuration: const Duration(seconds: 3),
+      autoCloseDuration: const Duration(seconds: 2, milliseconds: 500),
       progressBarTheme: ProgressIndicatorThemeData(
         color: type == ToastificationType.success
             ? Colors.green
@@ -33,7 +33,6 @@ abstract class AppToast {
             ? Colors.orange
             : Colors.red,
       ),
-      showProgressBar: true,
       backgroundColor: type == ToastificationType.success
           ? Colors.green
           : type == ToastificationType.info
