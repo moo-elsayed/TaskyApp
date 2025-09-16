@@ -7,15 +7,16 @@ import 'package:gap/gap.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/theming/colors_manager.dart';
+import 'package:tasky_app/core/widgets/app_toasts.dart';
 import 'package:tasky_app/core/widgets/custom_material_button.dart';
 import 'package:tasky_app/features/home/data/models/edit_task_args.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_cubit.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_states.dart';
 import 'package:tasky_app/features/home/presentation/widgets/custom_list_tile.dart';
+import 'package:toastification/toastification.dart';
 import '../../../../core/theming/styles.dart';
 import '../../../../core/utils/functions.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
-import '../../../../core/widgets/custom_toast.dart';
 import '../../data/models/task.dart';
 import '../widgets/custom_edit_task_container.dart';
 import '../widgets/edit_name_and_description_dialog.dart';
@@ -60,10 +61,10 @@ class _EditTaskViewState extends State<EditTaskView> {
     return BlocConsumer<TaskCubit, TaskStates>(
       listener: (context, state) {
         if (state is DeleteTaskSuccess) {
-          showCustomToast(
+          AppToast.showToast(
             context: context,
-            message: 'Task Deleted',
-            contentType: ContentType.success,
+            title: 'Task Deleted Successfully',
+            type: ToastificationType.success,
           );
           if (widget.editTaskArgs.isSearched) {
             context.read<TaskCubit>().search(widget.editTaskArgs.query!);
@@ -141,7 +142,9 @@ class _EditTaskViewState extends State<EditTaskView> {
                           context: context,
                           barrierDismissible: false,
                           firstDate: DateTime.now(),
-                          initialDate: _taskDate,
+                          initialDate: _taskDate.isAfter(DateTime.now())
+                              ? _taskDate
+                              : DateTime.now(),
                           lastDate: DateTime.now().add(
                             const Duration(days: 365 * 5),
                           ),
@@ -214,12 +217,11 @@ class _EditTaskViewState extends State<EditTaskView> {
             child: BlocConsumer<TaskCubit, TaskStates>(
               listener: (context, state) {
                 if (state is EditTaskSuccess) {
-                  showCustomToast(
+                  AppToast.showToast(
                     context: context,
-                    message: 'Task Edited',
-                    contentType: ContentType.success,
+                    title: 'Task Edited Successfully',
+                    type: ToastificationType.success,
                   );
-                  // context.read<TaskCubit>().getTasks(_taskDate);
                   if (widget.editTaskArgs.isSearched) {
                     context.read<TaskCubit>().search(
                       widget.editTaskArgs.query!,
@@ -266,7 +268,7 @@ class _EditTaskViewState extends State<EditTaskView> {
                           isCompleted: _isCompleted,
                           priority: _priority,
                           id: task.id,
-                          notificationId: task.notificationId!
+                          notificationId: task.notificationId,
                         ),
                       );
                     },

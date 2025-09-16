@@ -31,17 +31,8 @@ class TaskCubit extends Cubit<TaskStates> {
     var result = await _taskRepository.editTask(task);
     switch (result) {
       case NetworkSuccess():
-        await LocalNotificationService.cancelNotification(
-          id: task.notificationId!,
-        );
-        final notificationId =
-            await LocalNotificationService.showScheduledNotification(
-              task: task,
-            );
-        if (notificationId != null) {
-          task.notificationId = notificationId;
-          await _taskRepository.setNotificationId(task);
-        }
+        await _cancelNotification(task);
+        await _setNewNotification(task);
         emit(EditTaskSuccess());
       case NetworkFailure():
         log('Error scheduling notification');
@@ -71,20 +62,38 @@ class TaskCubit extends Cubit<TaskStates> {
     }
   }
 
-  Future markAsCompletedOrNot({
-    required String taskId,
-    required bool isCompleted,
-    required DateTime date,
-  }) async {
+  Future markAsCompletedOrNot(TaskModel task) async {
     var result = await _taskRepository.markAsCompletedOrNot(
-      taskId: taskId,
-      isCompleted: isCompleted,
+      taskId: task.id!,
+      isCompleted: task.isCompleted!,
     );
     switch (result) {
       case NetworkSuccess():
+        if (task.isCompleted == true) {
+          await _cancelNotification(task);
+        } else {
+          await _setNewNotification(task);
+        }
         return;
       case NetworkFailure():
         log(result.exception.toString());
+    }
+  }
+
+  Future<void> _setNewNotification(TaskModel task) async {
+    final notificationId =
+        await LocalNotificationService.showScheduledNotification(task: task);
+    if (notificationId != null) {
+      task.notificationId = notificationId;
+      await _taskRepository.setNotificationId(task);
+    }
+  }
+
+  Future<void> _cancelNotification(TaskModel task) async {
+    if (task.notificationId != null) {
+      await LocalNotificationService.cancelNotification(
+        id: task.notificationId!,
+      );
     }
   }
 }

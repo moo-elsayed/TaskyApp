@@ -6,11 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:tasky_app/core/theming/colors_manager.dart';
-import 'package:tasky_app/core/widgets/custom_toast.dart';
+import 'package:tasky_app/core/utils/functions.dart';
 import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
 import 'package:tasky_app/features/home/data/models/task.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/task_cubit/task_cubit.dart';
 import 'package:tasky_app/features/home/presentation/widgets/add_task_bottom_sheet.dart';
+import 'package:tasky_app/features/home/presentation/widgets/custom_animated_list.dart';
 import 'package:tasky_app/features/home/presentation/widgets/custom_dropdown_list.dart';
 import '../../../../core/helpers/dependency_injection.dart';
 import '../../data/repos/task_repo_imp.dart';
@@ -30,8 +31,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List<TaskModel> _uncompletedTasks = [];
-  List<TaskModel> _completedTasks = [];
   List<TaskModel> _tasks = [];
   List<TaskModel> _searchList = [];
   final List<DateTime> _days = List.generate(
@@ -43,7 +42,7 @@ class _HomeViewState extends State<HomeView> {
   late DateTime _currentDay = _days[3];
   Timer? _debounce;
   final _searchController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
+  late final ScrollController _scrollController;
 
   void _buildOnChanged(String? text) {
     if (text != null && text.trim().isNotEmpty) {
@@ -64,18 +63,10 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  void getTasksByCategory() {
-    _uncompletedTasks = _tasks
-        .where((task) => task.isCompleted == false)
-        .toList();
-    _completedTasks = _tasks.where((task) => task.isCompleted == true).toList();
-    log(_uncompletedTasks.length.toString());
-    log(_completedTasks.length.toString());
-  }
-
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     log(_currentDay.toString());
     context.read<TaskCubit>().getTasks(_currentDay);
   }
@@ -95,13 +86,8 @@ class _HomeViewState extends State<HomeView> {
         _scrollController.jumpTo(0);
         if (state is GetTasksSuccess) {
           _tasks = state.tasks;
-          getTasksByCategory();
         } else if (state is GetTasksFailure) {
-          showCustomToast(
-            context: context,
-            message: state.errorMessage,
-            contentType: ContentType.failure,
-          );
+          showErrorDialog(context: context, errorMessage: state.errorMessage);
         } else if (state is SearchTaskSuccess) {
           _searchList = state.tasks;
         }
@@ -194,10 +180,7 @@ class _HomeViewState extends State<HomeView> {
                       : (state is GetTasksSuccess)
                       ? (_tasks.isEmpty)
                             ? const NoTasksBody()
-                            : TasksListView(
-                                completedTasks: _completedTasks,
-                                uncompletedTasks: _uncompletedTasks,
-                              )
+                            : CustomAnimatedList(tasks: _tasks)
                       : (state is SearchTaskSuccess)
                       ? (_searchList.isEmpty)
                             ? const NoTasksBody()

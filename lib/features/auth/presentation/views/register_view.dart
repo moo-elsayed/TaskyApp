@@ -1,4 +1,3 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,13 +6,14 @@ import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/helpers/vaildator.dart';
 import 'package:tasky_app/core/theming/styles.dart';
 import 'package:tasky_app/core/utils/functions.dart';
+import 'package:tasky_app/core/widgets/app_toasts.dart';
 import 'package:tasky_app/core/widgets/custom_material_button.dart';
 import 'package:tasky_app/core/widgets/custom_toast.dart';
 import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
 import 'package:tasky_app/features/auth/data/models/login_args.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_cubit.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_states.dart';
-import '../../../../core/widgets/awesome_dialog.dart';
+import 'package:toastification/toastification.dart';
 import '../widgets/footer.dart';
 
 class RegisterView extends StatefulWidget {
@@ -51,24 +51,22 @@ class _LoginViewState extends State<RegisterView> {
             child: BlocConsumer<AuthCubit, AuthStates>(
               listener: (context, state) {
                 if (state is SignUpSuccess) {
-                  showAwesomeDialog(
+                  AppToast.showToast(
                     context: context,
                     title: 'Email verification',
+                    type: ToastificationType.info,
                     description: 'please verify your email',
-                    dialogType: DialogType.info,
-                    btnOkOnPress: () {
-                      context.pop(
-                        LoginArgs(
-                          email: _emailController.text,
-                          password: _passwordController.text,
-                        ),
-                      );
-                    },
                   );
                   showCustomToast(
                     context: context,
                     message: 'Email created',
                     contentType: ContentType.success,
+                  );
+                  context.pop(
+                    LoginArgs(
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                    ),
                   );
                 } else if (state is SignUpFailure) {
                   showErrorDialog(

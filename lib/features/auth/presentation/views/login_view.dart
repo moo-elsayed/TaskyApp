@@ -16,6 +16,8 @@ import 'package:tasky_app/features/auth/data/models/login_args.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_cubit.dart';
 import 'package:tasky_app/features/auth/presentation/managers/cubits/auth_cubit/auth_states.dart';
 import 'package:tasky_app/features/auth/presentation/widgets/sign_in_with_google_button.dart';
+import 'package:toastification/toastification.dart';
+import '../../../../core/widgets/app_toasts.dart';
 import '../widgets/footer.dart';
 
 class LoginView extends StatefulWidget {
@@ -61,10 +63,11 @@ class _LoginViewState extends State<LoginView> {
           );
           _navigateToHome(context);
         } else if (state is ForgetPasswordSuccess) {
-          showCustomToast(
+          AppToast.showToast(
             context: context,
-            message: 'an email has been sent to your email address',
-            contentType: ContentType.success,
+            title: 'Email Sent',
+            type: ToastificationType.info,
+            description: 'An email has been sent to your email address',
           );
         } else if (state is SignInFailure ||
             state is GoogleSignInFailure ||
@@ -190,10 +193,9 @@ class _LoginViewState extends State<LoginView> {
         if (_emailController.text.isNotEmpty) {
           context.read<AuthCubit>().forgetPassword(_emailController.text);
         } else {
-          showCustomToast(
+          showErrorDialog(
             context: context,
-            message: 'please enter your email',
-            contentType: ContentType.failure,
+            errorMessage: 'please enter your email',
           );
         }
       },

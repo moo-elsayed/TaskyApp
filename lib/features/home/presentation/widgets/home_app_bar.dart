@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/routing/routes.dart';
+import 'package:tasky_app/core/utils/functions.dart';
 import 'package:tasky_app/core/widgets/confirmation_dialog.dart';
-import 'package:tasky_app/core/widgets/custom_toast.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/logout_cubit/logout_cubit.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/logout_cubit/logout_states.dart';
 import '../../../../core/theming/styles.dart';
@@ -26,11 +26,7 @@ class HomeAppBar extends StatelessWidget {
                 predicate: (_) => false,
               );
             } else if (state is LogoutFailure) {
-              showCustomToast(
-                context: context,
-                message: 'Logout failed',
-                contentType: ContentType.failure,
-              );
+              showErrorDialog(context: context, errorMessage: 'Logout failed');
             }
           },
           child: Row(

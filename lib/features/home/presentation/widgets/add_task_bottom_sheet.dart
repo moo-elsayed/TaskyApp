@@ -8,12 +8,13 @@ import 'package:tasky_app/core/helpers/extentions.dart';
 import 'package:tasky_app/core/helpers/vaildator.dart';
 import 'package:tasky_app/core/theming/colors_manager.dart';
 import 'package:tasky_app/core/theming/styles.dart';
-import 'package:tasky_app/core/widgets/custom_toast.dart';
+import 'package:tasky_app/core/widgets/app_toasts.dart';
 import 'package:tasky_app/features/home/data/models/task.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/add_task_cubit/add_task_cubit.dart';
 import 'package:tasky_app/features/home/presentation/managers/cubits/add_task_cubit/add_task_states.dart';
 import 'package:tasky_app/features/home/presentation/widgets/task_priority_dialog.dart';
 import 'package:tasky_app/core/widgets/text_form_field_helper.dart';
+import 'package:toastification/toastification.dart';
 import '../../../../core/utils/functions.dart';
 import '../managers/cubits/task_cubit/task_cubit.dart';
 import 'custom_data_container.dart';
@@ -47,10 +48,10 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     return BlocConsumer<AddTaskCubit, AddTaskStates>(
       listener: (context, state) {
         if (state is AddTaskSuccess) {
-          showCustomToast(
+          AppToast.showToast(
             context: context,
-            message: 'Task added successfully',
-            contentType: ContentType.success,
+            title: 'Task Added Successfully',
+            type: ToastificationType.success,
           );
           if (_currentDate!.day == widget.currentDay.day) {
             context.read<TaskCubit>().getTasks(widget.currentDay);

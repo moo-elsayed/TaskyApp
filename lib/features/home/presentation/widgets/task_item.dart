@@ -17,13 +17,13 @@ class TaskItem extends StatefulWidget {
   const TaskItem({
     super.key,
     required this.task,
-    required this.onChanged,
+    this.onChanged,
     this.search = false,
     this.query,
   });
 
   final TaskModel task;
-  final Function() onChanged;
+  final Function()? onChanged;
   final bool? search;
   final String? query;
 
@@ -62,6 +62,7 @@ class _TaskItemState extends State<TaskItem> {
         from: 20,
         duration: const Duration(milliseconds: 200),
         child: Container(
+          margin: EdgeInsets.only(top: 16.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(color: ColorsManager.color6E6A7C),
@@ -73,11 +74,17 @@ class _TaskItemState extends State<TaskItem> {
               _isCompleted = isCompleted;
               setState(() {});
               await context.read<TaskCubit>().markAsCompletedOrNot(
-                taskId: widget.task.id!,
-                isCompleted: isCompleted,
-                date: widget.task.dateTime,
+                TaskModel(
+                  id: widget.task.id,
+                  name: widget.task.name,
+                  description: widget.task.description,
+                  dateTime: widget.task.dateTime,
+                  priority: widget.task.priority,
+                  isCompleted: _isCompleted,
+                  notificationId: widget.task.notificationId,
+                ),
               );
-              widget.onChanged();
+              widget.onChanged!();
             },
             isCompleted: _isCompleted,
             trailing: Column(
