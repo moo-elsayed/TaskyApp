@@ -1,16 +1,62 @@
-# tasky_app
+# TaskyApp ✅
 
-A new Flutter project.
+TaskyApp is a Flutter-based task management mobile application that helps users organize their daily tasks efficiently with a clean UI and smooth user experience.
 
-## Getting Started
+The app focuses on authentication, task management, notifications, and scalable state management using modern Flutter best practices.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- User authentication using Firebase Authentication
+- Google Sign-In support
+- Create, update, and manage tasks
+- Persistent user data using Cloud Firestore
+- Local notifications for task reminders
+- Smooth onboarding experience
+- Clean and responsive UI
+- State management using Bloc
+- Dependency injection using GetIt
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🛠 Tech Stack
+
+- **Flutter & Dart**
+- **State Management:** Bloc
+- **Dependency Injection:** GetIt
+- **Authentication:** Firebase Authentication
+- **Database:** Cloud Firestore
+- **Local Storage:** SharedPreferences
+- **Notifications:** flutter_local_notifications
+- **Timezone Handling:** timezone, flutter_timezone
+- **UI & Animations:** Google Fonts, flutter_svg, animate_do
+- **Utilities:** permission_handler, toastification, fluttertoast
+
+---
+
+## 🧱 Architecture Overview
+
+The project follows a layered architecture with a clear separation of concerns:
+
+- **Presentation Layer**
+  - UI Screens
+  - Bloc (State Management)
+
+- **Business Logic Layer**
+  - Events & States
+  - Application logic
+
+- **Data Layer**
+  - Firebase Authentication
+  - Cloud Firestore
+
+This structure improves maintainability, testability, and scalability.
+
+---
+
+## 🚀 Getting Started
+
+ Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/tasky-app.git
